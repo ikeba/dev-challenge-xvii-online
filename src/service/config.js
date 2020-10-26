@@ -1,0 +1,7 @@
+export const INITIAL_CONFIG = {
+  INITIAL_SPEED: 3
+};
+
+export const GAME_CONFIG = {
+  GAME_SPEED: INITIAL_CONFIG.INITIAL_SPEED
+};
