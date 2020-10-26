@@ -1,5 +1,5 @@
 export const INITIAL_CONFIG = {
-  INITIAL_SPEED: 3
+  INITIAL_SPEED: 0
 };
 
 export const GAME_CONFIG = {

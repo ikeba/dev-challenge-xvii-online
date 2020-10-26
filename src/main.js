@@ -1,5 +1,6 @@
 import {Scene} from "./scene";
 import {GAME_CONFIG} from "./service/config";
+import './controls';
 
 let canvas;
 let context;
