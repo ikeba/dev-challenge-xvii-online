@@ -1,5 +1,6 @@
 import {GameObject} from "./_game-object";
 import {camera} from "../camera";
+import {state} from "../state";
 
 let canvas;
 
@@ -21,7 +22,7 @@ export class Control extends GameObject {
     this.image = new Image();
     this.image.onload = () => this.imageReady = true;
     this.image.src = './images/arrow.png';
-    this.angle = 60;
+    this.angle = -state.angle;
 
     this.width = 150;
     this.height = 150;
@@ -46,8 +47,6 @@ export class Control extends GameObject {
 
     const y = y0 + (mouseY - y0) * Math.cos(rad) + (mouseX - x0) * Math.sin(rad);
 
-    console.log(x, y);
-
     return x > this.x && x < (this.x + this.width) && y > this.y && y < (this.y + this.height);
   }
 
@@ -71,39 +70,48 @@ export class Control extends GameObject {
       const x0 = 0;
       const y0 = this.height / 2;
 
-      console.log('x0 ', x0);
-      console.log('y0 ', y0);
-      console.log('mouseX ', mouseX);
-      console.log('mouseY ', mouseY);
+      // console.log('x0 ', x0);
+      // console.log('y0 ', y0);
+      // console.log('mouseX ', mouseX);
+      // console.log('mouseY ', mouseY);
 
       if (mouseX < 0 || mouseY > 0) {
         return;
       }
 
+      // const l = Math.abs(Math.sqrt(mouseX * mouseX + mouseY * mouseY));
+      // console.log(l);
+      // this.height = l;
+
       //this.angle = Math.atan2(mouse(e).y - (this.y + this.height / 2), (this.x + this.width / 2) + mouse(e).x) / Math.PI * 180;
       //const angle = (x0 * mouseX + y0 * mouseY) / (Math.sqrt(x0 * x0 + y0 * y0) * Math.sqrt(mouseX * mouseX + mouseY * mouseY));
       //console.log('angle= ', Math.acos(angle) * 180 / Math.PI);
       console.log('angle= ', Math.atan(mouseY / mouseX) * 180 / Math.PI);
-      this.angle = Math.atan(mouseY / mouseX) * 180 / Math.PI + 90;
+      this.angle = Math.atan(mouseY / mouseX) * 180 / Math.PI;
+      state.angle = Math.abs(this.angle);
       //console.log(mouse(e), this.angle);
     }
   }
 
   rotate() {
     //console.log('rotatatata', this.angle);
-    if (this.angle > 90) {
-      this.angle = -90;
-    }
-    if (this.angle < 0) {
-      this.angle = 0;
-    }
+    // if (this.angle > 90) {
+    //   this.angle = -90;
+    // }
+    // if (this.angle < 0) {
+    //   this.angle = 0;
+    // }
     this.ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
 
     this.ctx.rotate(Math.PI / 180 * (this.angle));
+    //console.log('angle= ', this.angle);
   }
 
   render(delta) {
     super.render();
+    if (state.gameSpeed !== 0) {
+      return;
+    }
     this.rotate();
     //this.ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     this.ctx.drawImage(this.image, -this.width / 2, -this.height / 2, this.width, this.height);

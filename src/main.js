@@ -1,6 +1,7 @@
 import { scene } from "./scene";
 import {GAME_CONFIG} from "./service/config";
 import './controls';
+import {state} from "./state";
 
 let canvas;
 let context;
@@ -32,7 +33,7 @@ function render(delta) {
     return;
   }
   context.clearRect(0, 0, canvas.width, canvas.height);
-  scene.render(delta * GAME_CONFIG.GAME_SPEED);
+  scene.render(delta * state.gameSpeed);
 }
 
 requestAnimationFrame(gameLoop);

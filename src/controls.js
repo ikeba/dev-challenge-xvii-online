@@ -1,5 +1,6 @@
 import {GAME_CONFIG} from "./service/config";
 import {scene} from "./scene";
+import {state} from "./state";
 
 const UI = {
   playPause: document.querySelector('#playPause')
@@ -7,10 +8,10 @@ const UI = {
 
 UI.playPause.addEventListener('click', () => {
   console.log('clisk');
-  if (GAME_CONFIG.GAME_SPEED === 0) {
-    GAME_CONFIG.GAME_SPEED = 3;
+  if (state.gameSpeed === 0) {
+    state.gameSpeed = 3;
     scene.find('rocket').reset();
   } else {
-    GAME_CONFIG.GAME_SPEED = 0
+    state.gameSpeed = 0
   }
 });

@@ -1,6 +1,7 @@
 import {Rocket} from "./game-objects/rocket";
 import {Control} from "./game-objects/control";
 import {Background} from "./game-objects/background";
+import {state} from "./state";
 
 class Scene {
   constructor() {
@@ -29,7 +30,7 @@ class Scene {
         className: Rocket,
         properties: {
           x: 0,
-          y: 500
+          y: state.y0
         }
       },
       {
