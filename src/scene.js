@@ -36,8 +36,8 @@ class Scene {
         name: 'control',
         className: Control,
         properties: {
-          x: 0,
-          y:300
+          x: 200,
+          y: 200
         }
       }
     ]

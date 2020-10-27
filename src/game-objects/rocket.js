@@ -90,7 +90,7 @@ export class Rocket extends GameObject {
     if (this.x > this.ctx.canvas.width - cameraPadding) {
       camera.x = this.x - this.ctx.canvas.width + cameraPadding;
     }
-    console.log(this.y);
+    //console.log(this.y);
     this.ctx.beginPath();
     this.ctx.arc(this.x - camera.x, this.y, 10, 0, 2 * Math.PI, false);
     this.ctx.fillStyle = 'green';
