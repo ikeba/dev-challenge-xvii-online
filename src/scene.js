@@ -1,7 +1,8 @@
 import {Rocket} from "./game-objects/rocket";
+import {Control} from "./game-objects/control";
 import {Background} from "./game-objects/background";
 
-export class Scene {
+class Scene {
   constructor() {
 
     this.structure = [
@@ -30,8 +31,20 @@ export class Scene {
           x: 0,
           y: 500
         }
+      },
+      {
+        name: 'control',
+        className: Control,
+        properties: {
+          x: 0,
+          y:300
+        }
       }
     ]
+  }
+
+  find(name) {
+    return this.structure.find((el) => el.name === name).gameObject;
   }
 
   initialize(context) {
@@ -50,3 +63,5 @@ export class Scene {
   }
 
 }
+
+export const scene = new Scene();

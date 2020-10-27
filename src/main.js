@@ -1,4 +1,4 @@
-import {Scene} from "./scene";
+import { scene } from "./scene";
 import {GAME_CONFIG} from "./service/config";
 import './controls';
 
@@ -7,7 +7,6 @@ let context;
 let delta = 0;
 let oldTimeStamp = 0;
 
-let scene;
 
 window.onload = init;
 
@@ -15,7 +14,6 @@ function init() {
   canvas = document.getElementById('game');
   context = canvas.getContext('2d');
 
-  scene = new Scene();
   scene.initialize(context);
 
   window.requestAnimationFrame(gameLoop);
