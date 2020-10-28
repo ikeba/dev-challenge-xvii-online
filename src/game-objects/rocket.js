@@ -3,6 +3,7 @@ import {camera} from "../camera";
 import {scene} from "../scene";
 import {GAME_CONFIG} from "../service/config";
 import {state} from "../state";
+import {getRotatedCoordinates} from "./control";
 
 const degToRad = (a) => a * Math.PI / 180;
 const radToDeg = (a) => a * 180 / Math.PI;
@@ -45,7 +46,7 @@ export class Rocket extends GameObject {
     this.image.src = './images/rocket.png';
     this.isMousePressed = false;
     this.control = scene.find('control');
-    this.rotation = 0;
+    this.rotation = -state.angle;
 
     this.width = 150;
     this.height = 150;
@@ -127,8 +128,8 @@ export class Rocket extends GameObject {
 
     // console.log(this.x, this.y, this.image.width, this.image.height);
 
-    if (this.y > y_floor) {
-      y0 = y_floor;
+    if (getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y  > y_floor) {
+      y0 = y_floor - this.height;
       x0 = this.x;
       state.speed *= impulseLossRatio;
       t = 0;
@@ -141,9 +142,9 @@ export class Rocket extends GameObject {
       return;
     }
     console.log('rotation', this.rotation);
-    this.ctx.translate(this.x - camera.x + this.width / 2, this.y);
+    this.ctx.translate(this.x - camera.x + this.width / 2, this.y + this.height);
     this.ctx.rotate(degToRad(this.rotation + 90));
-    this.ctx.translate(-this.x + camera.x - this.width / 2, -this.y);
+    this.ctx.translate(-this.x + camera.x - this.width / 2, -this.y - this.height);
   }
 
   checkWallCollision() {
@@ -171,6 +172,8 @@ export class Rocket extends GameObject {
 
     if (state.gameSpeed) {
       this.move(delta);
+    } else {
+      this.rotation = -state.angle;
     }
 
     //}

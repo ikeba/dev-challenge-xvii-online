@@ -15,13 +15,13 @@ const mouse = (e) => {
   }
 };
 
-const getRotatedCoordinates = (x, y, el) => {
+export const getRotatedCoordinates = (x, y, el, angle = 0) => {
   const x0 = el.x;
   const y0 = el.y + el.height / 2;
 
  // console.log('x0, y0', x0, y0);
  // console.log('angle', el.angle);
-  const rad = (Math.round(el.angle) * ( Math.PI / 180));
+  const rad = (Math.round(angle || el.angle) * ( Math.PI / 180));
   return {
     x: Math.round(x0 + (x - x0) * Math.cos(rad) - (y - y0) * Math.sin(rad)),
     y: Math.round(y0 + (y - y0) * Math.cos(rad) + (x - x0) * Math.sin(rad))
