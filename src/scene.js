@@ -29,7 +29,7 @@ class Scene {
         name: 'rocket',
         className: Rocket,
         properties: {
-          x: 0,
+          x: state.x0,
           y: state.y0
         }
       },
@@ -37,8 +37,8 @@ class Scene {
         name: 'control',
         className: Control,
         properties: {
-          x: 200,
-          y: 200
+          x: state.x0,
+          y: state.y0
         }
       }
     ]

@@ -12,6 +12,7 @@ const rocks2 = './images/background/rocks_2.png';
 const sky = './images/background/sky.png';
 
 const backgroundSrc = './images/background.png';
+const floor = './images/floor.png';
 
 function createImage(url) {
   const image = new Image();
@@ -48,6 +49,10 @@ export class Background extends GameObject {
       img: createImage(backgroundSrc),
       speed: 1
     };
+    this.floor = {
+      img: createImage(floor),
+      speed: 1
+    };
   }
 
   render() {
@@ -63,7 +68,7 @@ export class Background extends GameObject {
     //this.ctx.drawImage(this.clouds3.img, getX(this.clouds3), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
     //this.ctx.drawImage(this.rocks1.img, getX(this.rocks1), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.drawImage(this.backgroundSrc.img, getX(this.backgroundSrc), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
-
+    this.ctx.drawImage(this.floor.img, getX(this.floor), 550, this.ctx.canvas.width, 50);
 
     //this.ctx.drawImage(this.image0, this.x, this.y, this.ctx.canvas.width, this.ctx.canvas.height);
     //this.ctx.drawImage(this.image1, this.x + this.ctx.canvas.width, this.y, this.ctx.canvas.width, this.ctx.canvas.height);

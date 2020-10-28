@@ -15,8 +15,8 @@ const mouse = (e) => {
 };
 
 const g = 9.81;
-const y_floor = 600;
-const impulseLossRatio = 0.85;
+const y_floor = GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT;
+const impulseLossRatio = 0.75;
 const cameraPadding = 750;
 const scale = state.scale;
 
@@ -24,9 +24,8 @@ let canvas;
 let angle = state.angle;
 let y0 = state.y0;
 let x0 = state.x0;
-let v0 = state.speed;
-let t = 0;
 
+let t = 0;
 
 export class Rocket extends GameObject {
   constructor(x, y) {
@@ -53,7 +52,7 @@ export class Rocket extends GameObject {
     const mouseX = mouse(e).x;
     const mouseY = mouse(e).y;
 
-    console.log(mouse(e));
+   ///  console.log(mouse(e));
     const rad = (this.angle || 0) * 180 / Math.PI;
     const x0 = this.x + this.width / 2;
     const y0 = this.y + this.height / 2;
@@ -62,13 +61,12 @@ export class Rocket extends GameObject {
 
     const y = y0 + (mouseY - y0) * Math.cos(rad) + (mouseX - x0) * Math.sin(rad);
 
-    console.log(x, y);
+    // console.log(x, y);
 
     return x > this.x && x < (this.x + this.width) && y > this.y && y < (this.y + this.height);
   }
 
   onMouseDown(e) {
-    console.log('kuras');
     if (this.isMouseOverElement(e)) {
       this.isMousePressed = true;
       console.log('y rocket');
@@ -85,25 +83,28 @@ export class Rocket extends GameObject {
     } else {
       canvas.style.cursor = 'default';
     }
-    if (this.isMousePressed) {
-
-      y0 = mouse(e).y - this.height / 2;
-      this.y = y0;
-    }
+    // if (this.isMousePressed) {
+    //   const h = mouse(e).y - this.height / 2;
+    //   if (h > (GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - this.height / 2) || h < 200) {
+    //     return;
+    //   }
+    //   y0 = mouse(e).y - this.height / 2;
+    //   this.y = y0;
+    // }
   }
 
 
   reset() {
     x0 = this.x;
     y0 = this.y;
-    v0 = 150;
+    //v0 = 150;
     t = 0;
   }
 
   move(delta) {
     let angleInRads = angle * (Math.PI / 180);
-    this.x = x0 + v0 * Math.cos(angleInRads) * t * (1 / scale);
-    this.y = y0 - (v0 * Math.sin(angleInRads) * t - g * t * t / 2) * (1 / scale);
+    this.x = x0 + state.speed * Math.cos(angleInRads) * t * (1 / scale);
+    this.y = y0 - (state.speed * Math.sin(angleInRads) * t - g * t * t / 2) * (1 / scale);
     //const y1 = y0 - (v0 * Math.sin(alpha) * t - g * t * t / 2) * (1 / scale);
     //let radians = Math.atan2(y1 - this.y, x1 - this.x);
     //this.angle = 180 * radians / Math.PI;
@@ -114,7 +115,7 @@ export class Rocket extends GameObject {
     if (this.y > y_floor) {
       y0 = y_floor;
       x0 = this.x;
-      v0 = v0 * impulseLossRatio;
+      state.speed *= impulseLossRatio;
       t = 0;
     }
 
