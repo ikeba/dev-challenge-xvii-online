@@ -4,6 +4,9 @@ import {scene} from "../scene";
 import {GAME_CONFIG} from "../service/config";
 import {state} from "../state";
 
+const degToRad = (a) => a * Math.PI / 180;
+const radToDeg = (a) => a * 180 / Math.PI;
+
 const mouse = (e) => {
   const canvasBoundingRectangle = canvas.getBoundingClientRect();
   const mouseX = e.clientX - canvasBoundingRectangle.left;
@@ -34,13 +37,18 @@ export class Rocket extends GameObject {
     super(x, y);
     this.imageReady = false;
     this.image = new Image();
-    this.image.onload = () => this.imageReady = true;
+    this.image.onload = () => {
+      this.imageReady = true;
+      //this.width = this.image.width;
+      //this.height = this.image.height;
+    };
     this.image.src = './images/rocket.png';
     this.isMousePressed = false;
     this.control = scene.find('control');
+    this.rotation = 0;
 
-    this.width = 10;
-    this.height = 10;
+    this.width = 150;
+    this.height = 150;
 
     canvas = this.ctx.canvas;
     wall = scene.find('wall');
@@ -106,10 +114,14 @@ export class Rocket extends GameObject {
 
   move(delta) {
     let angleInRads = angle * (Math.PI / 180);
-    this.x = x0 + state.speed * Math.cos(angleInRads) * t * (1 / scale);
-    this.y = y0 - (state.speed * Math.sin(angleInRads) * t - g * t * t / 2) * (1 / scale);
+    const x1 = x0 + state.speed * Math.cos(angleInRads) * t * (1 / scale);
+    const y1 = y0 - (state.speed * Math.sin(angleInRads) * t - g * t * t / 2) * (1 / scale);
+    this.rotation = radToDeg(Math.atan((y1 - this.y) / (x1 - this.x)));
+    //console.log(y1 - this.y, x1 - this.x);
+    this.x = x1;
+    this.y = y1;
     //const y1 = y0 - (v0 * Math.sin(alpha) * t - g * t * t / 2) * (1 / scale);
-    //let radians = Math.atan2(y1 - this.y, x1 - this.x);
+
     //this.angle = 180 * radians / Math.PI;
     t += delta * scale;
 
@@ -125,9 +137,13 @@ export class Rocket extends GameObject {
   }
 
   rotate() {
-    this.ctx.translate(this.x, this.y);
-    this.ctx.rotate(Math.PI / 180 * (this.angle + 90));
-    this.ctx.translate(-this.x, -this.y);
+    if (!this.rotation) {
+      return;
+    }
+    console.log('rotation', this.rotation);
+    this.ctx.translate(this.x - camera.x + this.width / 2, this.y);
+    this.ctx.rotate(degToRad(this.rotation + 90));
+    this.ctx.translate(-this.x + camera.x - this.width / 2, -this.y);
   }
 
   checkWallCollision() {
@@ -147,16 +163,11 @@ export class Rocket extends GameObject {
       angle = state.angle;
     }
 
-    //console.log('ball angle ' + alpha);
-    //console.log('control angle ' + this.control.angle);
 
     super.render();
-    // if (!this.imageReady) {
-    //   return;
-    // }
-    //if (this.y <= y_floor) {
 
-    this.checkWallCollision();
+
+   // this.checkWallCollision();
 
     if (state.gameSpeed) {
       this.move(delta);
@@ -164,16 +175,18 @@ export class Rocket extends GameObject {
 
     //}
 
-    //this.rotate();
-    //this.ctx.drawImage(this.image, this.x, this.y, 150, 150);
+     this.rotate();
+
     if (this.x > this.ctx.canvas.width - cameraPadding) {
       camera.x = this.x - this.ctx.canvas.width + cameraPadding;
     }
+
+    this.ctx.drawImage(this.image, this.x - camera.x, this.y, 150, 150);
     //console.log(this.y);
-    this.ctx.beginPath();
-    this.ctx.arc(this.x - camera.x, this.y, 10, 0, 2 * Math.PI, false);
-    this.ctx.fillStyle = 'green';
-    this.ctx.fill();
+    // this.ctx.beginPath();
+    // this.ctx.arc(this.x - camera.x, this.y, 10, 0, 2 * Math.PI, false);
+    // this.ctx.fillStyle = 'green';
+    // this.ctx.fill();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 }

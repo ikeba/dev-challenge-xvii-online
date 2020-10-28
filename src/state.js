@@ -4,7 +4,7 @@ export const state = {
   gameSpeed: 0,
   angle: 45,
   y0: GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT,
-  x0: 50,
+  x0: 0,
   speed: 150,
   scale: 2,
   wallX: 600

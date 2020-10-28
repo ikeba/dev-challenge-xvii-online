@@ -19,8 +19,8 @@ const getRotatedCoordinates = (x, y, el) => {
   const x0 = el.x;
   const y0 = el.y + el.height / 2;
 
-  console.log('x0, y0', x0, y0);
-  console.log('angle', el.angle);
+ // console.log('x0, y0', x0, y0);
+ // console.log('angle', el.angle);
   const rad = (Math.round(el.angle) * ( Math.PI / 180));
   return {
     x: Math.round(x0 + (x - x0) * Math.cos(rad) - (y - y0) * Math.sin(rad)),
@@ -61,17 +61,17 @@ export class Control extends GameObject {
     const bottomLeft = getRotatedCoordinates(this.x, this.y + this.height, this);
     const bottomRight = getRotatedCoordinates(this.x + this.width, this.y + this.height, this);
 
-    console.log('mouse', mouse(e));
-    console.log('originTopLeft', this.x, this.y);
-    console.log('originTopLeft', this.x, this.y);
-    console.log('originBottomLeft', this.x, this.y + this.height);
-    console.log('originBottomRight', this.x + this.width, this.y + this.height);
-    console.log('originTopRight', this.x + this.width, this.y);
-    console.log('topLeft', topLeft);
-    console.log('bottomLeft', bottomLeft);
-    console.log('bottomRight', bottomRight);
-    console.log('topRight', topRight);
-    console.log('___');
+    // console.log('mouse', mouse(e));
+    // console.log('originTopLeft', this.x, this.y);
+    // console.log('originTopLeft', this.x, this.y);
+    // console.log('originBottomLeft', this.x, this.y + this.height);
+    // console.log('originBottomRight', this.x + this.width, this.y + this.height);
+    // console.log('originTopRight', this.x + this.width, this.y);
+    // console.log('topLeft', topLeft);
+    // console.log('bottomLeft', bottomLeft);
+    // console.log('bottomRight', bottomRight);
+    // console.log('topRight', topRight);
+    // console.log('___');
 
     const k1 = (topLeft.x - mouseX) * (bottomLeft.y - topLeft.y) - (bottomLeft.x - topLeft.x) * (topLeft.y - mouseY);
     const m1 = (bottomLeft.x - mouseX) * (topRight.y - bottomLeft.y) - (topRight.x - bottomLeft.x) * (bottomLeft.y - mouseY);
