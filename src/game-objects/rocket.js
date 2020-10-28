@@ -27,6 +27,8 @@ let x0 = state.x0;
 
 let t = 0;
 
+let wall;
+
 export class Rocket extends GameObject {
   constructor(x, y) {
     super(x, y);
@@ -41,6 +43,7 @@ export class Rocket extends GameObject {
     this.height = 10;
 
     canvas = this.ctx.canvas;
+    wall = scene.find('wall');
 
     canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
     window.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -127,6 +130,13 @@ export class Rocket extends GameObject {
     this.ctx.translate(-this.x, -this.y);
   }
 
+  checkWallCollision() {
+    if (this.x >= wall.x && this.y >= GAME_CONFIG.GAME_HEIGHT - wall.height) {
+      state.gameSpeed = 0;
+      //console.log('kurwa');
+    }
+  }
+
 
   render(delta) {
     if (!this.control) {
@@ -145,6 +155,9 @@ export class Rocket extends GameObject {
     //   return;
     // }
     //if (this.y <= y_floor) {
+
+    this.checkWallCollision();
+
     if (state.gameSpeed) {
       this.move(delta);
     }

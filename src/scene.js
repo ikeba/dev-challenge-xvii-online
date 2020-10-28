@@ -1,6 +1,7 @@
 import {Rocket} from "./game-objects/rocket";
 import {Control} from "./game-objects/control";
 import {Background} from "./game-objects/background";
+import {Wall} from "./game-objects/wall";
 import {state} from "./state";
 
 class Scene {
@@ -23,6 +24,14 @@ class Scene {
           x: 0,
           y: 0,
           initialX: 1000
+        }
+      },
+      {
+        name: 'wall',
+        className: Wall,
+        properties: {
+          x: state.wallX,
+          y: state.y0
         }
       },
       {

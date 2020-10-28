@@ -115,7 +115,7 @@ export class Control extends GameObject {
       // console.log('mouseX ', mouseX);
       // console.log('mouseY ', mouseY);
 
-      if (mouseX < this.x - this.width / 2 || mouseY > this.y + this.height) {
+      if ((mouseX <= this.x  - camera.x - this.width / 2 + 10) || (mouseY > this.y + this.height)) {
           return;
       }
 
@@ -131,8 +131,17 @@ export class Control extends GameObject {
       //this.angle = Math.atan2(mouse(e).y - (this.y + this.height / 2), (this.x + this.width / 2) + mouse(e).x) / Math.PI * 180;
       //const angle = (x0 * mouseX + y0 * mouseY) / (Math.sqrt(x0 * x0 + y0 * y0) * Math.sqrt(mouseX * mouseX + mouseY * mouseY));
       //console.log('angle= ', Math.acos(angle) * 180 / Math.PI);
-      console.log('angle= ', Math.atan(mouseY / mouseX) * 180 / Math.PI);
-      this.angle = Math.atan(mouseY / mouseX) * 180 / Math.PI;
+
+      const angle = Math.atan(mouseY / Math.abs(mouseX)) * 180 / Math.PI;
+      if (angle < -89) {
+        this.angle = -89;
+      } else if (angle > -1) {
+        this.angle = -1;
+      } else {
+        this.angle = angle;
+      }
+
+      console.log('angle= ',  this.angle);
       state.angle = Math.abs(this.angle);
       //console.log(mouse(e), this.angle);
     }
