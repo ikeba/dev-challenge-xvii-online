@@ -115,8 +115,8 @@ export class Control extends GameObject {
       // console.log('mouseX ', mouseX);
       // console.log('mouseY ', mouseY);
 
-      if (mouseX < 0 || mouseY > 0) {
-        //  return;
+      if (mouseX < this.x - this.width / 2 || mouseY > this.y + this.height) {
+          return;
       }
 
       const l = Math.abs(Math.sqrt(mouseX * mouseX + mouseY * mouseY));
@@ -140,12 +140,11 @@ export class Control extends GameObject {
 
   rotate() {
     //console.log('rotatatata', this.angle);
-    console.log('am i angle?', this.angle);
-    if (Math.abs(this.angle) > 90) {
-      this.angle = -90;
+    if (this.angle < -89) {
+      return;
     }
     if (this.angle > 0) {
-      this.angle = 0;
+      return;
     }
 
     this.ctx.translate(this.x, this.y + this.height / 2);
@@ -158,8 +157,8 @@ export class Control extends GameObject {
   }
 
   moveToRocket() {
-    //this.x = this.rocket.x - camera.x + 10;
-    //this.y = this.rocket.y - this.height / 2;
+    this.x = this.rocket.x - camera.x + 10;
+    this.y = this.rocket.y - this.height / 2;
   }
 
   render(delta) {
