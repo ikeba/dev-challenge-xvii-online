@@ -20,7 +20,7 @@ const mouse = (e) => {
 
 const g = 9.81;
 const y_floor = GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT;
-const impulseLossRatio = 0.75;
+const impulseLossRatio = 0.85;
 const cameraPadding = 750;
 const scale = state.scale;
 
@@ -118,7 +118,7 @@ export class Rocket extends GameObject {
     const x1 = x0 + state.speed * Math.cos(angleInRads) * t * (1 / scale);
     const y1 = y0 - (state.speed * Math.sin(angleInRads) * t - g * t * t / 2) * (1 / scale);
     this.rotation = radToDeg(Math.atan((y1 - this.y) / (x1 - this.x)));
-    //console.log(y1 - this.y, x1 - this.x);
+    console.log('rotation ', this.rotation);
     this.x = x1;
     this.y = y1;
     //const y1 = y0 - (v0 * Math.sin(alpha) * t - g * t * t / 2) * (1 / scale);
@@ -128,8 +128,22 @@ export class Rocket extends GameObject {
 
     // console.log(this.x, this.y, this.image.width, this.image.height);
 
-    if (getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y  > y_floor) {
-      y0 = y_floor - this.height;
+  //  const rocketY = getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y;
+    const rocketY = this.y;//getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y;
+
+
+
+    const rocketCenter = {
+      x: this.x - this.width / 2,
+      y: this.y + this.height / 2
+    };
+
+    console.log('y', rocketY);
+    const rotatedY = getRotatedCoordinates(this.x, rocketCenter.y, this, this.rotation).y;
+    console.log('rotatedY', rotatedY);
+    if (this.y- this.height / 2  > y_floor) {
+      //debugger;
+      y0 = y_floor - this.height / 2;
       x0 = this.x;
       state.speed *= impulseLossRatio;
       t = 0;
@@ -141,10 +155,10 @@ export class Rocket extends GameObject {
     if (!this.rotation) {
       return;
     }
-    console.log('rotation', this.rotation);
-    this.ctx.translate(this.x - camera.x + this.width / 2, this.y + this.height);
+    // console.log('rotation', this.rotation);
+    this.ctx.translate(this.x - camera.x + this.width / 2, this.y);
     this.ctx.rotate(degToRad(this.rotation + 90));
-    this.ctx.translate(-this.x + camera.x - this.width / 2, -this.y - this.height);
+    this.ctx.translate(-this.x + camera.x - this.width / 2, -this.y);
   }
 
   checkWallCollision() {
@@ -173,12 +187,12 @@ export class Rocket extends GameObject {
     if (state.gameSpeed) {
       this.move(delta);
     } else {
-      this.rotation = -state.angle;
+      this.rotation = this.rotation? this.rotation : -state.angle;
     }
 
     //}
 
-     this.rotate();
+    this.rotate();
 
     if (this.x > this.ctx.canvas.width - cameraPadding) {
       camera.x = this.x - this.ctx.canvas.width + cameraPadding;
