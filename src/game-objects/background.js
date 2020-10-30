@@ -1,5 +1,5 @@
 import {GameObject} from "./_game-object";
-import {camera} from "../camera";
+import {camera} from "../services/camera";
 
 const clouds1 = './images/background/clouds_1.png';
 const clouds2 = './images/background/clouds_2.png';
@@ -56,11 +56,10 @@ export class Background extends GameObject {
   }
 
   render() {
-    super.render();
+
 
     const getX = (asset) => {
-      const x = (((-camera.x) % this.ctx.canvas.width) + this.initialX);
-      return x;
+      return (((-camera.x) % asset.img.width) + this.initialX);
     };
 
     //this.ctx.drawImage(this.sky.img, getX(this.sky), this.y, this.ctx.canvas.width, this.ctx.canvas.height);

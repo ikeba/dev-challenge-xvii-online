@@ -1,10 +1,10 @@
-import {Rocket} from "./game-objects/rocket";
-import {Control} from "./game-objects/control";
-import {Background} from "./game-objects/background";
-import {Wall} from "./game-objects/wall";
+import {Rocket} from "../game-objects/rocket";
+import {Control} from "../game-objects/control";
+import {Background} from "../game-objects/background";
+import {Wall} from "../game-objects/wall";
 import {state} from "./state";
-import {Hud} from "./game-objects/hud";
-import {GAME_CONFIG} from "./service/config";
+import {Hud} from "../game-objects/hud";
+import {GAME_CONFIG} from "./config";
 
 class Scene {
   constructor() {
@@ -20,20 +20,11 @@ class Scene {
         }
       },
       {
-        name: 'background-next',
-        className: Background,
-        properties: {
-          x: 0,
-          y: 0,
-          initialX: 1000
-        }
-      },
-      {
         name: 'wall',
         className: Wall,
         properties: {
           x: state.wallX,
-          y: GAME_CONFIG.GAME_HEIGHT - state.wallHeight
+          y: GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.WALL_HEIGHT
         }
       },
       {

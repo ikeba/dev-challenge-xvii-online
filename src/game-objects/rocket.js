@@ -1,37 +1,10 @@
 import {GameObject} from "./_game-object";
-import {camera} from "../camera";
-import {scene} from "../scene";
-import {GAME_CONFIG} from "../service/config";
-import {state} from "../state";
-import {getRotatedCoordinates} from "./control";
+import {camera} from "../services/camera";
+import {scene} from "../services/scene";
+import {GAME_CONFIG} from "../services/config";
+import {state} from "../services/state";
 
-const degToRad = (a) => a * Math.PI / 180;
-const radToDeg = (a) => a * 180 / Math.PI;
-
-const mouse = (e) => {
-  const canvasBoundingRectangle = canvas.getBoundingClientRect();
-  const mouseX = e.clientX - canvasBoundingRectangle.left;
-  const mouseY = e.clientY - canvasBoundingRectangle.top;
-  return {
-    x: mouseX,
-    y: mouseY
-  }
-};
-
-const g = 9.81;
 const y_floor = GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT;
-const impulseLossRatio = 0.85;
-const cameraPadding = GAME_CONFIG.GAME_WIDTH / 2;
-const scale = state.scale;
-
-let canvas;
-let angle = state.angle;
-let y0 = state.y0;
-let x0 = state.x0;
-
-let t = 0;
-
-let wall;
 
 export class Rocket extends GameObject {
   constructor(x, y) {
@@ -40,112 +13,74 @@ export class Rocket extends GameObject {
     this.image = new Image();
     this.image.onload = () => {
       this.imageReady = true;
-      //this.width = this.image.width;
-      //this.height = this.image.height;
     };
     this.image.src = './images/rocket.png';
-    this.isMousePressed = false;
-    this.control = scene.find('control');
+
+    this.x0 = state.x0;
+    this.y0 = state.y0;
+    this.t = 0;
+
     this.rotation = -state.angle;
 
     this.width = 150;
     this.height = 150;
 
-    canvas = this.ctx.canvas;
-    wall = scene.find('wall');
+    this.control = scene.find('control');
+    this.wall = scene.find('wall');
 
-    canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-    window.addEventListener('mouseup', this.onMouseUp.bind(this));
+    state.canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
+    window.addEventListener('mouseup', this._onMouseUp.bind(this));
     window.addEventListener('mousemove', this.onMouseMove.bind(this));
   }
 
   isMouseOverElement(e) {
-
-    const mouseX = mouse(e).x;
-    const mouseY = mouse(e).y;
-
-    ///  console.log(mouse(e));
-    const rad = (this.angle || 0) * 180 / Math.PI;
     const x0 = this.x + this.width / 2;
-    const y0 = this.y + this.height / 2;
-
-    const x = x0 + (mouseX - x0) * Math.cos(rad) - (mouseY - y0) * Math.sin(rad);
-
-    const y = y0 + (mouseY - y0) * Math.cos(rad) + (mouseX - x0) * Math.sin(rad);
-
-    // console.log(x, y);
-
-    return x > this.x && x < (this.x + this.width) && y > this.y && y < (this.y + this.height);
-  }
-
-  onMouseDown(e) {
-    if (this.isMouseOverElement(e)) {
-      this.isMousePressed = true;
-      console.log('y rocket');
-    }
-  }
-
-  onMouseUp() {
-    this.isMousePressed = false;
+    const y0 = this.y;
+    this.rotation += 90;
+    const isMouseOver = super.isMouseOverElement(e, x0, y0);
+    this.rotation -= 90;
+    return isMouseOver;
   }
 
   onMouseMove(e) {
     if (this.isMouseOverElement(e)) {
-      canvas.style.cursor = 'pointer';
+      state.canvas.style.cursor = 'pointer';
     } else {
-      canvas.style.cursor = 'default';
+      state.canvas.style.cursor = 'default';
     }
-    // if (this.isMousePressed) {
-    //   const h = mouse(e).y - this.height / 2;
-    //   if (h > (GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - this.height / 2) || h < 200) {
-    //     return;
-    //   }
-    //   y0 = mouse(e).y - this.height / 2;
-    //   this.y = y0;
-    // }
+
+    if (this.isMousePressed) {
+      const h = this._getMouseCoords(e).y - this.height / 2;
+      if (h > (GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - this.height / 2) || h < 200) {
+        return;
+      }
+      this.y0 = this._getMouseCoords(e).y - this.height / 2;
+      this.y = this.y0;
+    }
   }
 
-
   reset() {
-    x0 = this.x;
-    y0 = this.y;
-    //v0 = 150;
-    t = 0;
+    this.x0 = this.x;
+    this.y0 = this.y;
+    this.t = 0;
   }
 
   move(delta) {
-    let angleInRads = angle * (Math.PI / 180);
-    const x1 = x0 + state.speed * Math.cos(angleInRads) * t * (1 / scale);
-    const y1 = y0 - (state.speed * Math.sin(angleInRads) * t - g * t * t / 2) * (1 / scale);
-    this.rotation = radToDeg(Math.atan((y1 - this.y) / (x1 - this.x)));
-    console.log('rotation ', this.rotation);
+    const rads = this._degToRad(state.angle);
+    const x1 = this.x0 + state.power * Math.cos(rads) * this.t * (1 / GAME_CONFIG.SCALE);
+    const y1 = this.y0 - (state.power * Math.sin(rads) * this.t - GAME_CONFIG.G * this.t * this.t / 2) * (1 / GAME_CONFIG.SCALE);
+    this.rotation = this._radToDeg(Math.atan((y1 - this.y) / (x1 - this.x)));
+
     this.x = x1;
     this.y = y1;
-    //const y1 = y0 - (v0 * Math.sin(alpha) * t - g * t * t / 2) * (1 / scale);
 
-    //this.angle = 180 * radians / Math.PI;
-    t += delta * scale;
+    this.t += delta * GAME_CONFIG.SCALE;
 
-    // console.log(this.x, this.y, this.image.width, this.image.height);
-
-    //  const rocketY = getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y;
-    const rocketY = this.y;//getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y;
-
-
-    const rocketCenter = {
-      x: this.x - this.width / 2,
-      y: this.y + this.height / 2
-    };
-
-    console.log('y', rocketY);
-    const rotatedY = getRotatedCoordinates(this.x, rocketCenter.y, this, this.rotation).y;
-    console.log('rotatedY', rotatedY);
     if (this.y - this.height / 2 > y_floor) {
-      //debugger;
-      y0 = y_floor - this.height / 2;
-      x0 = this.x;
-      state.speed *= impulseLossRatio;
-      t = 0;
+      this.y0 = y_floor - this.height / 2;
+      this.x0 = this.x;
+      this.t = 0;
+      state.power *= GAME_CONFIG.IMPULSE_LOSS_RATIO;
     }
 
   }
@@ -154,58 +89,39 @@ export class Rocket extends GameObject {
     if (!this.rotation) {
       return;
     }
-    // console.log('rotation', this.rotation);
     this.ctx.translate(this.x - camera.x + this.width / 2, this.y);
-    this.ctx.rotate(degToRad(this.rotation + 90));
+    this.ctx.rotate(this._degToRad(this.rotation + 90));
     this.ctx.translate(-this.x + camera.x - this.width / 2, -this.y);
   }
 
   checkWallCollision() {
-    if ((this.x + this.width / 3) >= wall.x && (this.x - this.width / 3) <= wall.x + wall.width  && this.y >= GAME_CONFIG.GAME_HEIGHT - state.wallHeight) {
+    if ((this.x + this.width / 3) >= this.wall.x &&
+      (this.x - this.width / 3) <= this.wall.x + this.wall.width &&
+      this.y >= GAME_CONFIG.GAME_HEIGHT - this.wall.height) {
       state.gameSpeed = 0;
-      //console.log('kurwa');
     }
   }
-
 
   render(delta) {
     if (!this.control) {
       this.control = scene.find('control');
     }
 
-    if (angle !== state.angle) {
-      angle = state.angle;
+    if (this.rotation !== state.angle) {
+      this.rotation = -state.angle;
     }
 
-
-    super.render();
-
-
-    this.checkWallCollision();
-
-    if (state.gameSpeed) {
+    if (state.isPlaying) {
       this.move(delta);
+      camera.move(this.x);
     } else {
       this.rotation = this.rotation ? this.rotation : -state.angle;
     }
 
-    //}
-
+    this.checkWallCollision();
     this.rotate();
 
-    if (this.x > this.ctx.canvas.width - cameraPadding) {
-      camera.x = this.x - this.ctx.canvas.width + cameraPadding;
-    } else {
-      camera.x = 0;
-    }
-    console.log('camera x', camera.x);
-
     this.ctx.drawImage(this.image, this.x - camera.x, this.y, 150, 150);
-    //console.log(this.y);
-    // this.ctx.beginPath();
-    // this.ctx.arc(this.x - camera.x, this.y, 10, 0, 2 * Math.PI, false);
-    // this.ctx.fillStyle = 'green';
-    // this.ctx.fill();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 }

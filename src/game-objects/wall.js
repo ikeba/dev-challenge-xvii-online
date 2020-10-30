@@ -1,27 +1,22 @@
 import {GameObject} from "./_game-object";
-import {GAME_CONFIG} from "../service/config";
-import {camera} from "../camera";
-import {state} from "../state";
+import {camera} from "../services/camera";
+import {GAME_CONFIG} from "../services/config";
 
 export class Wall extends GameObject {
   constructor(x, y) {
     super(x, y);
     this.imageReady = false;
     this.image = new Image();
-    this.height = state.wallHeight;
-    this.height = state.wallWidth;
+    this.height = GAME_CONFIG.WALL_HEIGHT;
+    this.width = GAME_CONFIG.WALL_WIDTH;
     this.image.onload = () => {
       this.imageReady = true;
       this.height = this.image.height;
     };
     this.image.src = './images/wall.png';
-    console.log(this.image);
   }
 
-
-  render(delta) {
-    super.render();
-
-    this.ctx.drawImage(this.image, this.x - camera.x, this.y, state.wallWidth, state.wallHeight);
+  render() {
+    this.ctx.drawImage(this.image, this.x - camera.x, this.y, this.width, this.height);
   }
 }

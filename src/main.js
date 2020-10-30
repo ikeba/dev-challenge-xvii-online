@@ -1,7 +1,7 @@
-import { scene } from "./scene";
-import {GAME_CONFIG} from "./service/config";
+import {scene} from "./services/scene";
+import {GAME_CONFIG} from "./services/config";
 import './controls';
-import {state} from "./state";
+import {state} from "./services/state";
 
 let canvas;
 let context;
@@ -15,6 +15,7 @@ function init() {
   canvas = document.getElementById('game');
   context = canvas.getContext('2d');
 
+  state.canvas = canvas;
   scene.initialize(context);
 
   window.requestAnimationFrame(gameLoop);
