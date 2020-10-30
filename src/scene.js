@@ -3,6 +3,8 @@ import {Control} from "./game-objects/control";
 import {Background} from "./game-objects/background";
 import {Wall} from "./game-objects/wall";
 import {state} from "./state";
+import {Hud} from "./game-objects/hud";
+import {GAME_CONFIG} from "./service/config";
 
 class Scene {
   constructor() {
@@ -31,7 +33,7 @@ class Scene {
         className: Wall,
         properties: {
           x: state.wallX,
-          y: state.y0
+          y: GAME_CONFIG.GAME_HEIGHT - state.wallHeight
         }
       },
       {
@@ -48,6 +50,14 @@ class Scene {
         properties: {
           x: state.x0,
           y: state.y0
+        }
+      },
+      {
+        name: 'hud',
+        className: Hud,
+        properties: {
+          x: GAME_CONFIG.GAME_WIDTH - 50,
+          y: 50
         }
       }
     ]

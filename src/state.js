@@ -7,5 +7,7 @@ export const state = {
   x0: 0,
   speed: 150,
   scale: 2,
-  wallX: 600
+  wallX: 600,
+  wallHeight: GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - 150,
+  wallWidth:  150
 };

@@ -9,7 +9,7 @@ const UI = {
 UI.playPause.addEventListener('click', () => {
   console.log('clisk');
   if (state.gameSpeed === 0) {
-    state.gameSpeed = 3;
+    state.gameSpeed = 2;
     scene.find('rocket').reset();
   } else {
     state.gameSpeed = 0
