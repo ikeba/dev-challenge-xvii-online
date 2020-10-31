@@ -6,6 +6,10 @@ import {state} from "./state";
 import {Gui} from "../game-objects/gui";
 import {GAME_CONFIG} from "./config";
 
+/**
+ * A scene that contains all game objects, their initial coordinates and some methods for interaction and drawing.
+ * A singleton.
+ */
 class Scene {
   constructor() {
 
@@ -53,10 +57,17 @@ class Scene {
     ]
   }
 
+  /**
+   *
+   * @param {string} name GameObject name.
+   */
   find(name) {
     return this.structure.find((el) => el.name === name).gameObject;
   }
 
+  /**
+   * Initializes the scene and creates instances of all game objects.
+   */
   initialize() {
     this.structure.map((obj) => {
       obj.gameObject = new obj.className({
@@ -66,12 +77,18 @@ class Scene {
     });
   }
 
+  /**
+   * Clears the scene.
+   */
   clear() {
     this.structure.map((obj) => {
       delete obj.gameObject;
     });
   }
 
+  /**
+   * Renders the scene.
+   */
   render(delta) {
     this.structure.map((obj) => {
       if (obj.gameObject) {

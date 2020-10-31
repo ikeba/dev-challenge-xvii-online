@@ -1,6 +1,6 @@
 import {scene} from "./services/scene";
 import {GAME_CONFIG} from "./services/config";
-import './controls';
+import './services/controls';
 import {state} from "./services/state";
 
 let canvas;

@@ -5,6 +5,8 @@ import {GAME_CONFIG} from "../services/config";
 /**
  * The class responsible only for drawing the wall.
  * All control is in the Rocket class.
+ *
+ * @extends GameObject
  */
 export class Wall extends GameObject {
   constructor(x, y) {

@@ -5,6 +5,8 @@ import {scene} from "../services/scene";
 
 /**
  * The class responsible for drawing the service information about the game process.
+ *
+ * @extends GameObject
  */
 export class Gui extends GameObject {
   constructor(x, y) {

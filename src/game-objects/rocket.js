@@ -11,6 +11,8 @@ const y_floor = GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT;
 
 /**
  * The class responsible for the behavior of the main object of the game, at the moment, is a rocket.
+ *
+ * @extends GameObject
  */
 export class Rocket extends GameObject {
   constructor(x, y) {

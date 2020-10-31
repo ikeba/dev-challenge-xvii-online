@@ -29,6 +29,8 @@ function createImage(url) {
 
 /**
  * A class that is responsible for creating and displaying the parallax background.
+ *
+ * @extends GameObject
  */
 export class Background extends GameObject {
   constructor(props) {

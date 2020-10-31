@@ -1,14 +1,20 @@
 const GAME_CONFIG = {
   GAME_WIDTH: 1000,
   GAME_HEIGHT: 600,
+  SCALE: 2,
   BACKGROUND_HEIGHT: 50,
   MIN_POWER: 100,
   MAX_POWER: 300,
   MIN_ANGLE: -1,
   MAX_ANGLE: -89,
   G: 9.81,
+  /**
+   * The coefficient by which the rocket's flight power will decrease with each impact on the floor.
+   */
   IMPULSE_LOSS_RATIO: 0.75,
-  SCALE: 2,
+  /**
+   * The minimum distance to the edge of the playing area that the rocket may approach before the camera shift is activated.
+   */
   CAMERA_PADDING: 500
 };
 

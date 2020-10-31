@@ -5,6 +5,8 @@ import {GAME_CONFIG} from "../services/config";
 
 /**
  * The class responsible for the work of the arrow that controls the motion vector of the main object of the game.
+ *
+ * @extends GameObject
  */
 export class Control extends GameObject {
   constructor(x, y) {
