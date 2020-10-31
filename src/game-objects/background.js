@@ -1,17 +1,10 @@
 import {GameObject} from "./_game-object";
-import {camera} from "../services/camera";
+import {state} from "../services/state";
 
 const clouds1 = './images/background/clouds_1.png';
 const clouds2 = './images/background/clouds_2.png';
-const clouds3 = './images/background/clouds_3.png';
-const clouds4 = './images/background/clouds_4.png';
-
-const rocks1 = './images/background/rocks_1.png';
-const rocks2 = './images/background/rocks_2.png';
-
 const sky = './images/background/sky.png';
-
-const backgroundSrc = './images/background.png';
+const rocks = './images/background/rocks.png';
 const floor = './images/floor.png';
 
 function createImage(url) {
@@ -23,31 +16,22 @@ function createImage(url) {
 export class Background extends GameObject {
   constructor(props) {
     super(props);
-    this.initialX = props.initialX || 0;
 
-    // this.sky = {
-    //   img: createImage(sky),
-    //   speed: 0.5
-    // };
-    // this.clouds2 = {
-    //   img: createImage(clouds2),
-    //   speed: 1
-    // };
-    // this.clouds3 = {
-    //   img: createImage(clouds3),
-    //   speed: 1
-    // };
-    // this.rocks1 = {
-    //   img: createImage(rocks1),
-    //   speed: 1.5
-    // };
-    // this.rocks2 = {
-    //   img: createImage(rocks2),
-    //   speed: 1
-    // };
-    this.backgroundSrc = {
-      img: createImage(backgroundSrc),
-      speed: 1
+    this.sky = {
+      img: createImage(sky),
+      speed: 0.5
+    };
+    this.nearClouds = {
+      img: createImage(clouds1),
+      speed: 1.5,
+    };
+    this.farClouds = {
+      img: createImage(clouds2),
+      speed: 1.1,
+    };
+    this.rocks = {
+      img: createImage(rocks),
+      speed: 1.3
     };
     this.floor = {
       img: createImage(floor),
@@ -55,21 +39,40 @@ export class Background extends GameObject {
     };
   }
 
+  getX(asset, isSecond = false) {
+    return (((-state.cameraX * asset.speed) % this.ctx.canvas.width) + (isSecond ? this.ctx.canvas.width : 0));
+  }
+
+  drawFloor() {
+    this.ctx.drawImage(this.floor.img, this.getX(this.floor), 550, this.ctx.canvas.width, 50);
+    this.ctx.drawImage(this.floor.img, this.getX(this.floor, true), 550, this.ctx.canvas.width, 50);
+  }
+
+  drawSky() {
+    this.ctx.drawImage(this.sky.img, this.getX(this.sky), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.drawImage(this.sky.img, this.getX(this.sky, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+  }
+
+  drawFarClouds() {
+    this.ctx.drawImage(this.farClouds.img, this.getX(this.farClouds), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.drawImage(this.farClouds.img, this.getX(this.farClouds, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+  }
+
+  drawNearClouds() {
+    this.ctx.drawImage(this.nearClouds.img, this.getX(this.nearClouds), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.drawImage(this.nearClouds.img, this.getX(this.nearClouds, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+  }
+
+  drawBackground() {
+    this.ctx.drawImage(this.rocks.img, this.getX(this.rocks), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.ctx.drawImage(this.rocks.img, this.getX(this.rocks, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+  }
+
   render() {
-
-
-    const getX = (asset) => {
-      return (((-camera.x) % asset.img.width) + this.initialX);
-    };
-
-    //this.ctx.drawImage(this.sky.img, getX(this.sky), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
-    //this.ctx.drawImage(this.clouds2.img, getX(this.clouds2), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
-    //this.ctx.drawImage(this.clouds3.img, getX(this.clouds3), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
-    //this.ctx.drawImage(this.rocks1.img, getX(this.rocks1), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.drawImage(this.backgroundSrc.img, getX(this.backgroundSrc), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
-    this.ctx.drawImage(this.floor.img, getX(this.floor), 550, this.ctx.canvas.width, 50);
-
-    //this.ctx.drawImage(this.image0, this.x, this.y, this.ctx.canvas.width, this.ctx.canvas.height);
-    //this.ctx.drawImage(this.image1, this.x + this.ctx.canvas.width, this.y, this.ctx.canvas.width, this.ctx.canvas.height);
+    this.drawSky();
+    this.drawFarClouds();
+    this.drawBackground();
+    this.drawNearClouds();
+    this.drawFloor();
   }
 }

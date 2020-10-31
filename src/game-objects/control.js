@@ -1,5 +1,4 @@
 import {GameObject} from "./_game-object";
-import {camera} from "../services/camera";
 import {state} from "../services/state";
 import {scene} from "../services/scene";
 import {GAME_CONFIG} from "../services/config";
@@ -41,17 +40,11 @@ export class Control extends GameObject {
       let mouseX = this._getMouseCoords(e).x - this.x;
       let mouseY = this._getMouseCoords(e).y - this.y - this.height / 2;
 
-      console.log(this.y, mouseY);
       if (mouseX < 0 || mouseY > 0) {
         return;
       }
 
-      // if ((mouseX <= this.x - camera.x - this.width / 2 + 10) || (mouseY > this.y + this.height)) {
-      //     return;
-      // }
       const rotation = Math.round(this._radToDeg(Math.atan(mouseY / Math.abs(mouseX))));
-      console.log(rotation);
-
       const controlWidth = Math.abs(Math.sqrt(mouseX * mouseX + mouseY * mouseY));
 
       if (controlWidth > GAME_CONFIG.MIN_POWER && controlWidth < GAME_CONFIG.MAX_POWER) {
@@ -59,7 +52,6 @@ export class Control extends GameObject {
         this.width = power;
         state.power = power;
       }
-
 
       if (rotation < GAME_CONFIG.MAX_ANGLE) {
         this.rotation = GAME_CONFIG.MAX_ANGLE;
@@ -87,7 +79,7 @@ export class Control extends GameObject {
   }
 
   moveToRocket() {
-    this.x = this.rocket.x - camera.x + 10 + this.height / 2;
+    this.x = this.rocket.x - state.cameraX + 10 + this.height / 2;
     this.y = this.rocket.y - this.height / 2;
   }
 
@@ -96,7 +88,7 @@ export class Control extends GameObject {
   }
 
   render() {
-    if (state.isPlaying) {
+    if (state.isPlaying || state.isGameOver) {
       return;
     }
 

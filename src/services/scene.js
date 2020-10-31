@@ -3,7 +3,7 @@ import {Control} from "../game-objects/control";
 import {Background} from "../game-objects/background";
 import {Wall} from "../game-objects/wall";
 import {state} from "./state";
-import {Hud} from "../game-objects/hud";
+import {Gui} from "../game-objects/gui";
 import {GAME_CONFIG} from "./config";
 
 class Scene {
@@ -15,8 +15,7 @@ class Scene {
         className: Background,
         properties: {
           x: 0,
-          y: 0,
-          initialX: 0
+          y: 0
         }
       },
       {
@@ -45,10 +44,10 @@ class Scene {
       },
       {
         name: 'hud',
-        className: Hud,
+        className: Gui,
         properties: {
-          x: GAME_CONFIG.GAME_WIDTH - 50,
-          y: 50
+          x: GAME_CONFIG.HUD_X,
+          y: GAME_CONFIG.HUD_Y
         }
       }
     ]
@@ -58,18 +57,26 @@ class Scene {
     return this.structure.find((el) => el.name === name).gameObject;
   }
 
-  initialize(context) {
+  initialize() {
     this.structure.map((obj) => {
       obj.gameObject = new obj.className({
         ...obj.properties,
-        ctx: context
+        ctx: state.canvas.getContext('2d')
       })
+    });
+  }
+
+  clear() {
+    this.structure.map((obj) => {
+      delete obj.gameObject;
     });
   }
 
   render(delta) {
     this.structure.map((obj) => {
-      obj.gameObject.render(delta);
+      if (obj.gameObject) {
+        obj.gameObject.render(delta);
+      }
     });
   }
 

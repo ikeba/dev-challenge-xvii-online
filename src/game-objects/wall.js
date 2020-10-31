@@ -1,5 +1,5 @@
 import {GameObject} from "./_game-object";
-import {camera} from "../services/camera";
+import {state} from "../services/state";
 import {GAME_CONFIG} from "../services/config";
 
 export class Wall extends GameObject {
@@ -17,6 +17,6 @@ export class Wall extends GameObject {
   }
 
   render() {
-    this.ctx.drawImage(this.image, this.x - camera.x, this.y, this.width, this.height);
+    this.ctx.drawImage(this.image, this.x - state.cameraX, this.y, this.width, this.height);
   }
 }

@@ -15,6 +15,9 @@ function init() {
   canvas = document.getElementById('game');
   context = canvas.getContext('2d');
 
+  canvas.setAttribute('width', String(GAME_CONFIG.GAME_WIDTH));
+  canvas.setAttribute('height', String(GAME_CONFIG.GAME_HEIGHT));
+
   state.canvas = canvas;
   scene.initialize(context);
 
