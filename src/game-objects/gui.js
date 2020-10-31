@@ -3,7 +3,9 @@ import {GAME_CONFIG} from "../services/config";
 import {state} from "../services/state";
 import {scene} from "../services/scene";
 
-
+/**
+ * The class responsible for drawing the service information about the game process.
+ */
 export class Gui extends GameObject {
   constructor(x, y) {
     super(x, y);
@@ -28,16 +30,31 @@ export class Gui extends GameObject {
     this.rocket = null;
   }
 
+  /**
+   * Draws the parameter name on certain line.
+   *
+   * @param {string} text Parameter name.
+   * @param {number} line Line.
+   */
   drawKey(text, line) {
     this.ctx.font = this.keyFont;
     this.ctx.fillText(text, this.x - this.keyPadding, this.y + line * this.lineHeight);
   }
 
+  /**
+   * Draws the parameter value on certain line.
+   *
+   * @param {string} text Parameter value.
+   * @param {number} line Line.
+   */
   drawValue(text, line) {
     this.ctx.font = this.valueFont;
     this.ctx.fillText(text, this.x - this.valuePadding, this.y + line * this.lineHeight);
   }
 
+  /**
+   * Defines the main object of the game, draws service information.
+   */
   render() {
     if (!this.rocket) {
       this.rocket = scene.find('rocket');

@@ -8,9 +8,13 @@ let context;
 let delta = 0;
 let oldTimeStamp = 0;
 
-
 window.onload = init;
 
+/**
+ * Initializes initial application container.
+ *
+ * @return {undefined}
+ */
 function init() {
   canvas = document.getElementById('game');
   context = canvas.getContext('2d');
@@ -24,6 +28,12 @@ function init() {
   window.requestAnimationFrame(gameLoop);
 }
 
+/**
+ * Count time to understand real FPS. Calls render function.
+ *
+ * @param timeStamp
+ * @return {undefined}
+ */
 function gameLoop(timeStamp) {
   delta = (timeStamp - oldTimeStamp) / 1000;
   oldTimeStamp = timeStamp;
@@ -32,6 +42,12 @@ function gameLoop(timeStamp) {
   requestAnimationFrame(gameLoop);
 }
 
+/**
+ * Goes through the scene, clears canvas and renders each gameObject with predefined speed.
+ *
+ * @param delta
+ * @return {undefined}
+ */
 function render(delta) {
   if (!context) {
     return;

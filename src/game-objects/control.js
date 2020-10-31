@@ -3,6 +3,9 @@ import {state} from "../services/state";
 import {scene} from "../services/scene";
 import {GAME_CONFIG} from "../services/config";
 
+/**
+ * The class responsible for the work of the arrow that controls the motion vector of the main object of the game.
+ */
 export class Control extends GameObject {
   constructor(x, y) {
     super(x, y);
@@ -22,12 +25,23 @@ export class Control extends GameObject {
     state.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
   }
 
+  /**
+   * Defines the point around which the element rotates and calls the parent class method.
+   *
+   * @param {MouseEvent} e Mouse event.
+   * @return {boolean} If the mouse cursor is over an element.
+   */
   isMouseOverElement(e) {
     const x0 = this.x;
     const y0 = this.y + this.height / 2;
     return super.isMouseOverElement(e, x0, y0);
   }
 
+  /**
+   * A method responsible for changing the initial power and angle of flight of the main object of the game.
+   *
+   * @param {MouseEvent} e Mouse event.
+   */
   onMouseMove(e) {
     if (this.isMouseOverElement(e)) {
       state.canvas.style.cursor = 'pointer';
@@ -37,6 +51,9 @@ export class Control extends GameObject {
 
     if (this.isMousePressed) {
 
+      /*
+       * The block responsible for preventing the motion vector from sending the object down or back.
+       */
       let mouseX = this._getMouseCoords(e).x - this.x;
       let mouseY = this._getMouseCoords(e).y - this.y - this.height / 2;
 
@@ -44,7 +61,9 @@ export class Control extends GameObject {
         return;
       }
 
-      const rotation = Math.round(this._radToDeg(Math.atan(mouseY / Math.abs(mouseX))));
+      /*
+       * Initial flight power is equal to the visible width of the vector and is limited at the bottom and top.
+       */
       const controlWidth = Math.abs(Math.sqrt(mouseX * mouseX + mouseY * mouseY));
 
       if (controlWidth > GAME_CONFIG.MIN_POWER && controlWidth < GAME_CONFIG.MAX_POWER) {
@@ -52,6 +71,11 @@ export class Control extends GameObject {
         this.width = power;
         state.power = power;
       }
+
+      /*
+       * The initial flight angle is equal to the tilt angle of the vector.
+       */
+      const rotation = Math.round(this._radToDeg(Math.atan(mouseY / Math.abs(mouseX))));
 
       if (rotation < GAME_CONFIG.MAX_ANGLE) {
         this.rotation = GAME_CONFIG.MAX_ANGLE;
@@ -65,6 +89,9 @@ export class Control extends GameObject {
     }
   }
 
+  /**
+   * Determines the point of canvas shift and rotate the vector to the specified angle.
+   */
   rotate() {
     if (this.rotation < GAME_CONFIG.MAX_ANGLE) {
       return;
@@ -78,15 +105,24 @@ export class Control extends GameObject {
     this.ctx.translate(-this.x, -this.y - this.height / 2);
   }
 
+  /**
+   * Moves the control vector to the point where the main object of the game is located.
+   */
   moveToRocket() {
     this.x = this.rocket.x - state.cameraX + 10 + this.height / 2;
     this.y = this.rocket.y - this.height / 2;
   }
 
+  /**
+   * Returns the vector width to the value defined in the application state.
+   */
   reset() {
     this.width = state.power;
   }
 
+  /**
+   * Draws a control vector with a certain angle near the main object of the game.
+   */
   render() {
     if (state.isPlaying || state.isGameOver) {
       return;

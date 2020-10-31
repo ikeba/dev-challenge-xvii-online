@@ -1,5 +1,8 @@
 import {state} from "../services/state";
 
+/**
+ * Main class for each gameObjects, encapsulates mouse methods, coordinates and rotation methods.
+ */
 export class GameObject {
   constructor(props) {
     this.x = props.x || 0;
@@ -10,6 +13,12 @@ export class GameObject {
     this.isMousePressed = false;
   }
 
+  /**
+   * Returns mouse coordinates.
+   *
+   * @param {MouseEvent} e Mouse event.
+   * @return {{x: number, y: number}} Mouse coordinates.
+   */
   _getMouseCoords(e) {
     const canvasBoundingRectangle = state.canvas.getBoundingClientRect();
     const mouseX = e.clientX - canvasBoundingRectangle.left;
@@ -20,7 +29,19 @@ export class GameObject {
     }
   }
 
-  _getRotatedCoordinates(x0, y0, x, y, angle) {
+  /**
+   * Returns the coordinates of a point that has been rotated at a certain angle around a certain point.
+   *
+   * @param {number} x0 The X coordinate of the point around which the rotation is performed.
+   * @param {number} y0 the Y coordinate of the point around which the rotation is performed.
+   * @param {number} x The X coordinate of the point that is rotated.
+   * @param {number} y The Y coordinate of the point that is rotated.
+   * @param {number} angle Angle of rotation. In the absence of the parameter, the rotation is carried out on the angle of the
+   * element in the context of which the function is called.
+   *
+   * @return {{x: number, y: number}} Coordinates of the point after turning.
+   */
+  _getRotatedCoordinates(x0, y0, x, y, angle = undefined) {
     const rad = this._degToRad(Math.round(angle ? angle : this.rotation));
     return {
       x: Math.round(x0 + (x - x0) * Math.cos(rad) - (y - y0) * Math.sin(rad)),
@@ -28,6 +49,16 @@ export class GameObject {
     };
   }
 
+  /**
+   * Checks if the mouse cursor is over an element. For a rectangular element (and in this game all elements are
+   * rectangular), two triangles are created and the point is checked for occurrence using a vector method.
+   *
+   * @param {MouseEvent} e Mouse event.
+   * @param {number=} x0 The X coordinate of the point around which the rotation of the element is performed.
+   * @param {number=} y0 the Y coordinate of the point around which the rotation of the element is performed.
+   *
+   * @return {boolean} If the mouse cursor is over an element.
+   */
   isMouseOverElement(e, x0, y0) {
     const mouseX = this._getMouseCoords(e).x;
     const mouseY = this._getMouseCoords(e).y;
@@ -48,20 +79,40 @@ export class GameObject {
       ((k2 <= 0 && m1 <= 0 && n2 <= 0) || (k2 >= 0 && m1 >= 0 && n2 >= 0));
   }
 
+  /**
+   * If the mouse cursor is above an element, activate the corresponding flag.
+   *
+   * @param {MouseEvent} e Mouse event.
+   */
   _onMouseDown(e) {
     if (this.isMouseOverElement(e)) {
       this.isMousePressed = true;
     }
   }
 
+  /**
+   * Converts radians into degrees.
+   *
+   * @param {number} angle Angle in radians.
+   * @return {number} Angle in degrees.
+   */
   _radToDeg(angle) {
     return angle * 180 / Math.PI;
   }
 
+  /**
+   * Converts degrees into radians.
+   *
+   * @param {number} angle Angle in degrees.
+   * @return {number} Angle in radians.
+   */
   _degToRad(angle) {
     return angle * Math.PI / 180;
   }
 
+  /**
+   * Deactivate the corresponding flag if the mouse button releases.
+   */
   _onMouseUp() {
     this.isMousePressed = false;
   }

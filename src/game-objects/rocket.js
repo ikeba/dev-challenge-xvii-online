@@ -3,8 +3,15 @@ import {scene} from "../services/scene";
 import {GAME_CONFIG} from "../services/config";
 import {state} from "../services/state";
 
+/**
+ * The constant that defines a "floor" coordinate.
+ * @type {number}
+ */
 const y_floor = GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT;
 
+/**
+ * The class responsible for the behavior of the main object of the game, at the moment, is a rocket.
+ */
 export class Rocket extends GameObject {
   constructor(x, y) {
     super(x, y);
@@ -34,24 +41,45 @@ export class Rocket extends GameObject {
     window.addEventListener('mousemove', this.onMouseMove.bind(this));
   }
 
+  /**
+   * Returns the coordinates of the rocket center taking into account the rotation and shift.
+   *
+   * @return {{x: number, y: number}} Coordinates of the rocket center
+   */
   get center() {
     const x0 = this.x + this.width / 2;
     const y0 = this.y;
+
+    /*
+     * It is necessary to "turn" the rocket before the calculations to match the view, as it will be rendered turned.
+     */
     this.rotation += 90;
     const center = this._getRotatedCoordinates(x0, y0, this.x + this.width / 2, this.y + this.height / 2, this.rotation);
     this.rotation -= 90;
     return center;
   }
 
-  isMouseOverElement(e) {
-    const x0 = this.x + this.width / 2;
-    const y0 = this.y;
+  /**
+   * Checks if the mouse cursor is over an element.
+   *
+   * @param {MouseEvent} e Mouse event.
+   * @param {number=} x0 The X coordinate of the point around which the rotation of the element is performed.
+   * @param {number=} y0 the Y coordinate of the point around which the rotation of the element is performed.
+   *
+   * @return {boolean} If the mouse cursor is over an element.
+   */
+  isMouseOverElement(e, x0 = this.x + this.width / 2, y0 = this.y) {
     this.rotation += 90;
     const isMouseOver = super.isMouseOverElement(e, x0, y0);
     this.rotation -= 90;
     return isMouseOver;
   }
 
+  /**
+   * Allows to change the initial height of the rocket by drag and drop.
+   *
+   * @param {MouseEvent} e Mouse event.
+   */
   onMouseMove(e) {
     if (this.isMouseOverElement(e)) {
       state.canvas.style.cursor = 'pointer';
@@ -69,12 +97,24 @@ export class Rocket extends GameObject {
     }
   }
 
+  /**
+   * Replaces the current coordinates in the formula for the movement of the body thrown at an angle to the horizon.
+   */
   reset() {
     this.x0 = this.x;
     this.y0 = this.y;
     this.t = 0;
   }
 
+  /**
+   * Calculates new coordinates for the rocket using a standard physics formula.
+   * Calculates the rotation angle based on the old and new coordinates.
+   * Calculates the maximum flight altitude during the whole game and the maximum range for the current parabola.
+   * Determines whether the rocket has fallen to the floor level and launches again at a reflected angle
+   * with a changed force level (loss of kinetic energy)
+   *
+   * @param {number} delta Value to change the time coordinate.
+   */
   move(delta) {
     let rads = this._degToRad(state.angle);
 
@@ -109,6 +149,11 @@ export class Rocket extends GameObject {
 
   }
 
+  /**
+   * Simple dropping down in a collision with a wall. When falling to the floor stops the animation.
+   *
+   * @param {number} delta Value to change the time coordinate.
+   */
   fall(delta) {
     let rads = this._degToRad(state.angle);
     this.y = this.y0 - (state.power * Math.sin(rads) * this.t - GAME_CONFIG.G * this.t * this.t / 2) * (1 / GAME_CONFIG.SCALE);
@@ -120,6 +165,9 @@ export class Rocket extends GameObject {
 
   }
 
+  /**
+   * Determines the point of canvas shift and rotate the rocket to the specified angle.
+   */
   rotate() {
     if (!this.rotation) {
       return;
@@ -129,6 +177,9 @@ export class Rocket extends GameObject {
     this.ctx.translate(-this.x + state.cameraX - this.width / 2, -this.y);
   }
 
+  /**
+   * It checks if a collision with a wall has occurred and starts the end of the game procedure, if any.
+   */
   checkWallCollision() {
     if ((this.center.x + this.width / 4) >= this.wall.x &&
       ((this.center.x - this.width / 4)) <= this.wall.x + this.wall.width &&
@@ -137,14 +188,21 @@ export class Rocket extends GameObject {
     }
   }
 
-  cameraMove(x) {
-    if (x > state.canvas.width - GAME_CONFIG.CAMERA_PADDING) {
-      state.cameraX = x - state.canvas.width + GAME_CONFIG.CAMERA_PADDING;
+  /**
+   * Moves the camera if the rocket came close enough to the end of the playing field.
+   */
+  cameraMove() {
+    if (this.x > state.canvas.width - GAME_CONFIG.CAMERA_PADDING) {
+      state.cameraX = this.x - state.canvas.width + GAME_CONFIG.CAMERA_PADDING;
     } else {
       state.cameraX = 0;
     }
   }
 
+  /**
+   * Finishes the game by changing the values in the application state and sends events to change the state of
+   * the control buttons.
+   */
   gameOver() {
     state.isPlaying = false;
     state.isFalling = true;
@@ -152,6 +210,11 @@ export class Rocket extends GameObject {
     window.dispatchEvent(new CustomEvent('gameover'));
   }
 
+  /**
+   * Renders the rocket.
+   *
+   * @param {number} delta Value to change the time coordinate.
+   */
   render(delta) {
     if (!this.control) {
       this.control = scene.find('control');
@@ -163,7 +226,7 @@ export class Rocket extends GameObject {
 
     if (state.isPlaying) {
       this.move(delta);
-      this.cameraMove(this.x);
+      this.cameraMove();
     } else if (state.isFalling) {
       this.fall(delta);
       //this.cameraMove(this.x);
