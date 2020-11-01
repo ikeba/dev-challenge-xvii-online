@@ -36,7 +36,7 @@ export class GameObject {
    * @param {number} y0 the Y coordinate of the point around which the rotation is performed.
    * @param {number} x The X coordinate of the point that is rotated.
    * @param {number} y The Y coordinate of the point that is rotated.
-   * @param {number} angle Angle of rotation. In the absence of the parameter, the rotation is carried out on the angle of the
+   * @param {number} angle Angle of rotation in degrees. In the absence of the parameter, the rotation is carried out on the angle of the
    * element in the context of which the function is called.
    *
    * @return {{x: number, y: number}} Coordinates of the point after turning.

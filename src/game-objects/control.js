@@ -59,6 +59,7 @@ export class Control extends GameObject {
       let mouseX = this._getMouseCoords(e).x - this.x;
       let mouseY = this._getMouseCoords(e).y - this.y - this.height / 2;
 
+      console.log(mouseX, mouseY);
       if (mouseX < 0 || mouseY > 0) {
         return;
       }
@@ -67,6 +68,7 @@ export class Control extends GameObject {
        * Initial flight power is equal to the visible width of the vector and is limited at the bottom and top.
        */
       const controlWidth = Math.abs(Math.sqrt(mouseX * mouseX + mouseY * mouseY));
+      console.log(controlWidth);
 
       if (controlWidth > GAME_CONFIG.MIN_POWER && controlWidth < GAME_CONFIG.MAX_POWER) {
         const power = Math.round(controlWidth);

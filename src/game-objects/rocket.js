@@ -143,8 +143,8 @@ export class Rocket extends GameObject {
     }
 
     if (this.center.y + this.height / 3 > y_floor) {
-      this.y0 = y_floor - this.height;
-      this.x0 = this.x;
+      this.y0 = y_floor - this.height; //this.y - this.height; //this._getRotatedCoordinates(xR, yR, this.x, this.y, this.angle - 90).y - this.height;
+      this.x0 = this.x;//this._getRotatedCoordinates(xR, yR, this.x, this.y, this.angle - 90).x;
       this.t = 0;
       state.power *= GAME_CONFIG.IMPULSE_LOSS_RATIO;
     }

@@ -11,7 +11,7 @@ const initialState = {
   isPlaying: false,
   isFalling: false,
   isGameOver: false,
-  gameSpeed: 2,
+  gameSpeed: 3,
   /**
    * The angle at which the rocket will be launched.
    */

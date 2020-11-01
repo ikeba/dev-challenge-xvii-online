@@ -10,11 +10,22 @@
     #game {
       border: 1px solid lightblue;
     }
+
     .container {
       text-align: center;
     }
+
     #speedContainer {
       margin: 10px;
+    }
+
+    .description {
+      font-family: Arial, Helvetica, sans-serif;
+      margin-top: 10px;
+    }
+
+    .description p {
+      margin: 5px;
     }
   </style>
 </head>
@@ -23,18 +34,24 @@
   <div>
     <canvas id="game"></canvas>
   </div>
-
   <div class="controls">
     <button id="playPause">Play / Pause</button>
     <div id="speedContainer">
       <button id="speed-1">Speed 1</button>
-      <button id="speed-2" disabled>Speed 2</button>
-      <button id="speed-3">Speed 3</button>
+      <button id="speed-2">Speed 2</button>
+      <button id="speed-3" disabled>Speed 3</button>
     </div>
     <button id="playAgain" disabled>Play Again</button>
   </div>
+  <div class="description">
+    <p>To change the initial altitude, move the rocket.</p>
+    <p>To change force and angle of flight, move the velocity vector. The force is directly proportional to the length
+      of the arrow.</p>
+    <p>To start the game press the button <b>Play / Pause</b>.</p>
+    <p>You can change the speed during the game.</p>
+    <p>At the end of the animation or on impact with a wall, click <b>Play Again</b> to restart.</p>
+  </div>
 </div>
-
 
 
 <!-- built files will be auto injected -->
