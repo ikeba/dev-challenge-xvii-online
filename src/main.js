@@ -53,7 +53,7 @@ function render(delta) {
     return;
   }
   context.clearRect(0, 0, canvas.width, canvas.height);
-  scene.render(delta * state.gameSpeed);
+  scene.render(delta * state.gameSpeed * GAME_CONFIG.SPEED_SCALE);
 }
 
 requestAnimationFrame(gameLoop);

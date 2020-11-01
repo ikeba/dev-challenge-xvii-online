@@ -13,7 +13,7 @@ export class Gui extends GameObject {
     super(x, y);
 
     this.width = 200;
-    this.height = 175;
+    this.height = 200;
 
     this.image = new Image();
     this.image.onload = () => {
@@ -85,5 +85,8 @@ export class Gui extends GameObject {
 
     this.drawKey('Power', 5);
     this.drawValue(Math.round(state.power), 5);
+
+    this.drawKey('Time from launch', 6);
+    this.drawValue(Math.round(this.rocket.t || 0), 6);
   }
 }

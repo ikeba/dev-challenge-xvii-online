@@ -24,9 +24,13 @@ UI.playPause.addEventListener('click',
   () => {
     if (!state.isPlaying) {
       state.isPlaying = true;
-      scene.find('rocket').reset();
-      scene.find('control').reset();
+      if (state.angle !== state.oldAngle || state.power !== state.oldPower) {
+        scene.find('rocket').reset();
+        scene.find('control').reset();
+      }
     } else {
+      state.oldAngle = state.angle;
+      state.oldPower = state.power;
       state.isPlaying = false;
     }
   });

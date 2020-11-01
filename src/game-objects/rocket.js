@@ -17,12 +17,18 @@ const y_floor = GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT;
 export class Rocket extends GameObject {
   constructor(x, y) {
     super(x, y);
-    this.imageReady = false;
-    this.image = new Image();
-    this.image.onload = () => {
-      this.imageReady = true;
+    this.rocketImageReady = false;
+    this.rocketIdleImageReady = false;
+    this.rocket = new Image();
+    this.rocketIdle = new Image();
+    this.rocket.onload = () => {
+      this.rocketImageReady = true;
     };
-    this.image.src = './images/rocket.png';
+    this.rocketIdle.onload = () => {
+      this.rocketIdleImageReady = true;
+    };
+    this.rocket.src = './images/rocket.png';
+    this.rocketIdle.src = './images/rocket_idle.png';
 
     this.x0 = state.x0;
     this.y0 = state.y0;
@@ -89,7 +95,7 @@ export class Rocket extends GameObject {
       state.canvas.style.cursor = 'default';
     }
 
-    if (this.isMousePressed) {
+    if (this.isMousePressed && !state.isPlaying) {
       const h = this._getMouseCoords(e).y - this.height / 2;
       if (h > (GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - this.height / 2) || h < 200) {
         return;
@@ -126,7 +132,10 @@ export class Rocket extends GameObject {
     this.rotation = this._radToDeg(Math.atan((y1 - this.y) / (x1 - this.x)));
     this.x = x1;
     this.y = y1;
-    this.t += delta * GAME_CONFIG.SCALE;
+
+    if (state.isPlaying) {
+      this.t += delta * GAME_CONFIG.SCALE;
+    }
 
     const Lmax = state.power * state.power * Math.sin(2 * rads) / GAME_CONFIG.G;
 
@@ -143,8 +152,8 @@ export class Rocket extends GameObject {
     }
 
     if (this.center.y + this.height / 3 > y_floor) {
-      this.y0 = y_floor - this.height; //this.y - this.height; //this._getRotatedCoordinates(xR, yR, this.x, this.y, this.angle - 90).y - this.height;
-      this.x0 = this.x;//this._getRotatedCoordinates(xR, yR, this.x, this.y, this.angle - 90).x;
+      this.y0 = y_floor - this.height;
+      this.x0 = this.x;
       this.t = 0;
       state.power *= GAME_CONFIG.IMPULSE_LOSS_RATIO;
     }
@@ -218,6 +227,10 @@ export class Rocket extends GameObject {
    * @param {number} delta Value to change the time coordinate.
    */
   render(delta) {
+    if (!this.rocketIdleImageReady || !this.rocketImageReady) {
+      return;
+    }
+
     if (!this.control) {
       this.control = scene.find('control');
     }
@@ -231,7 +244,6 @@ export class Rocket extends GameObject {
       this.cameraMove();
     } else if (state.isFalling) {
       this.fall(delta);
-      //this.cameraMove(this.x);
     } else {
       //this.rotation = this.rotation ? this.rotation : -state.angle;
     }
@@ -239,7 +251,12 @@ export class Rocket extends GameObject {
     this.checkWallCollision();
     this.rotate();
 
-    this.ctx.drawImage(this.image, this.x - state.cameraX, this.y, 150, 150);
+    if (state.isPlaying) {
+      this.ctx.drawImage(this.rocket, this.x - state.cameraX, this.y, 150, 150);
+    } else {
+      this.ctx.drawImage(this.rocketIdle, this.x - state.cameraX, this.y, 150, 150);
+    }
+
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 }

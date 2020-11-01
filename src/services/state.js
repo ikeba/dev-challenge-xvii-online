@@ -11,17 +11,25 @@ const initialState = {
   isPlaying: false,
   isFalling: false,
   isGameOver: false,
-  gameSpeed: 3,
+  gameSpeed: 2,
   /**
    * The angle at which the rocket will be launched.
    */
   angle: 45,
   /**
+   * The initial power of the rocket (and width of the control vector).
+   */
+  power: 150,
+  /**
+   * Values of angle and power for play/pause action,
+   */
+  pauseAngle: 0,
+  pausePower: 0,
+  /**
    * Initial coordinates and power of the rocket (and control vector, with a shift)
    */
   y0: GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - 150,
   x0: 75,
-  power: 150,
   /**
    * Position of the wall.
    */

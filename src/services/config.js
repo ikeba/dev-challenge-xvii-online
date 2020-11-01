@@ -2,11 +2,12 @@ const GAME_CONFIG = {
   GAME_WIDTH: 1000,
   GAME_HEIGHT: 600,
   SCALE: 2,
+  SPEED_SCALE: 1.5,
   BACKGROUND_HEIGHT: 50,
   MIN_POWER: 200,
   MAX_POWER: 400,
   MIN_ANGLE: -10,
-  MAX_ANGLE: -89,
+  MAX_ANGLE: -69,
   G: 9.81,
   /**
    * The coefficient by which the rocket's flight power will decrease with each impact on the floor.

@@ -11,7 +11,7 @@ import {GAME_CONFIG} from "../services/config";
 export class Control extends GameObject {
   constructor(x, y) {
     super(x, y);
-
+    this.imageReady = false;
     this.image = new Image();
     this.image.onload = () => this.imageReady = true;
     this.image.src = './images/arrow.png';
@@ -51,7 +51,7 @@ export class Control extends GameObject {
       state.canvas.style.cursor = 'default';
     }
 
-    if (this.isMousePressed) {
+    if (this.isMousePressed && !state.isPlaying) {
 
       /*
        * The block responsible for preventing the motion vector from sending the object down or back.
@@ -59,7 +59,6 @@ export class Control extends GameObject {
       let mouseX = this._getMouseCoords(e).x - this.x;
       let mouseY = this._getMouseCoords(e).y - this.y - this.height / 2;
 
-      console.log(mouseX, mouseY);
       if (mouseX < 0 || mouseY > 0) {
         return;
       }
@@ -68,7 +67,6 @@ export class Control extends GameObject {
        * Initial flight power is equal to the visible width of the vector and is limited at the bottom and top.
        */
       const controlWidth = Math.abs(Math.sqrt(mouseX * mouseX + mouseY * mouseY));
-      console.log(controlWidth);
 
       if (controlWidth > GAME_CONFIG.MIN_POWER && controlWidth < GAME_CONFIG.MAX_POWER) {
         const power = Math.round(controlWidth);
@@ -128,6 +126,10 @@ export class Control extends GameObject {
    * Draws a control vector with a certain angle near the main object of the game.
    */
   render() {
+    if (!this.imageReady) {
+      return;
+    }
+
     if (state.isPlaying || state.isGameOver) {
       return;
     }

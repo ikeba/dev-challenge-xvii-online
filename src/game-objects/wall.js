@@ -17,7 +17,6 @@ export class Wall extends GameObject {
     this.width = GAME_CONFIG.WALL_WIDTH;
     this.image.onload = () => {
       this.imageReady = true;
-      this.height = this.image.height;
     };
     this.image.src = './images/wall.png';
   }
@@ -26,6 +25,9 @@ export class Wall extends GameObject {
    * Draws the wall.
    */
   render() {
+    if (!this.imageReady) {
+      return;
+    }
     this.ctx.drawImage(this.image, this.x - state.cameraX, this.y, this.width, this.height);
   }
 }

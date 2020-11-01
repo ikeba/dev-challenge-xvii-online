@@ -1,5 +1,7 @@
 # dev-challenge-xvii-online
 
+### Compiled and ready to run files are located in the dist folder.
+
 ## Run without installing
 ```
 npx http-server ./dist

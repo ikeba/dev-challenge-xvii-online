@@ -8,24 +8,34 @@ const rocks = './images/background/rocks.png';
 const floor = './images/floor.png';
 
 /**
- * Creates an Image element.
- *
- * @param {string} url Image url.
- * @return {HTMLImageElement} Image element.
- */
-function createImage(url) {
-  const image = new Image();
-  image.src = url;
-  return image;
-}
-
-
-/**
  * A background element with Image and speed.
  * @typedef {Object<HTMLImageElement, number>} BackgroundElement
  * @property {HTMLImageElement} img Background element.
  * @property {number} speed The speed at which the object moves relative to the camera.
+ * @property {boolean} ready Whether the image is loaded.
  */
+
+/**
+ * Creates an Image element.
+ *
+ * @param {string} url Image url.
+ * @param {number} speed Element speed.
+ * @return {BackgroundElement} Background element.
+ */
+function createImage(url, speed = 1) {
+  const image = new Image();
+  const asset = {
+    img: image,
+    speed,
+    ready: false
+  };
+  image.src = url;
+  image.onload = () => {
+    asset.ready = true;
+  };
+  return asset;
+}
+
 
 /**
  * A class that is responsible for creating and displaying the parallax background.
@@ -39,42 +49,27 @@ export class Background extends GameObject {
     /**
      * @property {BackgroundElement} sky Main background element, should run slowly.
      */
-    this.sky = {
-      img: createImage(sky),
-      speed: 0.5
-    };
+    this.sky = createImage(sky, 0.5);
 
     /**
      * @property {BackgroundElement} nearClouds The closest background element, should run very fast.
      */
-    this.nearClouds = {
-      img: createImage(clouds1),
-      speed: 1.5,
-    };
+    this.nearClouds = createImage(clouds1, 1.5);
 
     /**
      * @property {BackgroundElement} farClouds Medium background element, should run close to the camera speed.
      */
-    this.farClouds = {
-      img: createImage(clouds2),
-      speed: 1.1,
-    };
+    this.farClouds = createImage(clouds2, 1.1);
 
     /**
      * @property {BackgroundElement} rocks Medium background element, should run close to the camera speed.
      */
-    this.rocks = {
-      img: createImage(rocks),
-      speed: 1.3
-    };
+    this.rocks = createImage(rocks, 1.3);
 
     /**
-     * @property {BackgroundElement} rocks Scene floor, should run wuth the camera speed.
+     * @property {BackgroundElement} rocks Scene floor, should run with the camera speed.
      */
-    this.floor = {
-      img: createImage(floor),
-      speed: 1
-    };
+    this.floor = createImage(floor);
   }
 
   /**
@@ -95,6 +90,9 @@ export class Background extends GameObject {
    * Draws the floor.
    */
   drawFloor() {
+    if (!this.floor.ready) {
+      return;
+    }
     this.ctx.drawImage(this.floor.img, this.getX(this.floor), 550, this.ctx.canvas.width, 50);
     this.ctx.drawImage(this.floor.img, this.getX(this.floor, true), 550, this.ctx.canvas.width, 50);
   }
@@ -103,6 +101,9 @@ export class Background extends GameObject {
    * Draws the sky.
    */
   drawSky() {
+    if (!this.sky.ready) {
+      return;
+    }
     this.ctx.drawImage(this.sky.img, this.getX(this.sky), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.drawImage(this.sky.img, this.getX(this.sky, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
   }
@@ -111,6 +112,9 @@ export class Background extends GameObject {
    * Draws far clouds.
    */
   drawFarClouds() {
+    if (!this.farClouds.ready) {
+      return;
+    }
     this.ctx.drawImage(this.farClouds.img, this.getX(this.farClouds), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.drawImage(this.farClouds.img, this.getX(this.farClouds, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
   }
@@ -119,6 +123,9 @@ export class Background extends GameObject {
    * Draws near clouds.
    */
   drawNearClouds() {
+    if (!this.nearClouds.ready) {
+      return;
+    }
     this.ctx.drawImage(this.nearClouds.img, this.getX(this.nearClouds), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.drawImage(this.nearClouds.img, this.getX(this.nearClouds, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
   }
@@ -127,6 +134,9 @@ export class Background extends GameObject {
    * Draws the rocks.
    */
   drawRocks() {
+    if (!this.rocks.ready) {
+      return;
+    }
     this.ctx.drawImage(this.rocks.img, this.getX(this.rocks), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.drawImage(this.rocks.img, this.getX(this.rocks, true), this.y, this.ctx.canvas.width, this.ctx.canvas.height);
   }
