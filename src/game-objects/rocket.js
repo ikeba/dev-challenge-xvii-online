@@ -1,211 +1,262 @@
 import {GameObject} from "./_game-object";
-import {camera} from "../camera";
-import {scene} from "../scene";
-import {GAME_CONFIG} from "../service/config";
-import {state} from "../state";
-import {getRotatedCoordinates} from "./control";
+import {scene} from "../services/scene";
+import {GAME_CONFIG} from "../services/config";
+import {state} from "../services/state";
 
-const degToRad = (a) => a * Math.PI / 180;
-const radToDeg = (a) => a * 180 / Math.PI;
-
-const mouse = (e) => {
-  const canvasBoundingRectangle = canvas.getBoundingClientRect();
-  const mouseX = e.clientX - canvasBoundingRectangle.left;
-  const mouseY = e.clientY - canvasBoundingRectangle.top;
-  return {
-    x: mouseX,
-    y: mouseY
-  }
-};
-
-const g = 9.81;
+/**
+ * The constant that defines a "floor" coordinate.
+ * @type {number}
+ */
 const y_floor = GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT;
-const impulseLossRatio = 0.85;
-const cameraPadding = GAME_CONFIG.GAME_WIDTH / 2;
-const scale = state.scale;
 
-let canvas;
-let angle = state.angle;
-let y0 = state.y0;
-let x0 = state.x0;
-
-let t = 0;
-
-let wall;
-
+/**
+ * The class responsible for the behavior of the main object of the game, at the moment, is a rocket.
+ *
+ * @extends GameObject
+ */
 export class Rocket extends GameObject {
   constructor(x, y) {
     super(x, y);
-    this.imageReady = false;
-    this.image = new Image();
-    this.image.onload = () => {
-      this.imageReady = true;
-      //this.width = this.image.width;
-      //this.height = this.image.height;
+    this.rocketImageReady = false;
+    this.rocketIdleImageReady = false;
+    this.rocket = new Image();
+    this.rocketIdle = new Image();
+    this.rocket.onload = () => {
+      this.rocketImageReady = true;
     };
-    this.image.src = './images/rocket.png';
-    this.isMousePressed = false;
-    this.control = scene.find('control');
+    this.rocketIdle.onload = () => {
+      this.rocketIdleImageReady = true;
+    };
+    this.rocket.src = './images/rocket.png';
+    this.rocketIdle.src = './images/rocket_idle.png';
+
+    this.x0 = state.x0;
+    this.y0 = state.y0;
+    this.t = 0;
+
     this.rotation = -state.angle;
 
     this.width = 150;
     this.height = 150;
 
-    canvas = this.ctx.canvas;
-    wall = scene.find('wall');
+    this.control = scene.find('control');
+    this.wall = scene.find('wall');
 
-    canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-    window.addEventListener('mouseup', this.onMouseUp.bind(this));
+    this.maxY = this.center.y;
+
+    state.canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
+    window.addEventListener('mouseup', this._onMouseUp.bind(this));
     window.addEventListener('mousemove', this.onMouseMove.bind(this));
   }
 
-  isMouseOverElement(e) {
-
-    const mouseX = mouse(e).x;
-    const mouseY = mouse(e).y;
-
-    ///  console.log(mouse(e));
-    const rad = (this.angle || 0) * 180 / Math.PI;
+  /**
+   * Returns the coordinates of the rocket center taking into account the rotation and shift.
+   *
+   * @return {{x: number, y: number}} Coordinates of the rocket center
+   */
+  get center() {
     const x0 = this.x + this.width / 2;
-    const y0 = this.y + this.height / 2;
+    const y0 = this.y;
 
-    const x = x0 + (mouseX - x0) * Math.cos(rad) - (mouseY - y0) * Math.sin(rad);
-
-    const y = y0 + (mouseY - y0) * Math.cos(rad) + (mouseX - x0) * Math.sin(rad);
-
-    // console.log(x, y);
-
-    return x > this.x && x < (this.x + this.width) && y > this.y && y < (this.y + this.height);
+    /*
+     * It is necessary to "turn" the rocket before the calculations to match the view, as it will be rendered turned.
+     */
+    this.rotation += 90;
+    const center = this._getRotatedCoordinates(x0, y0, this.x + this.width / 2, this.y + this.height / 2, this.rotation);
+    this.rotation -= 90;
+    return center;
   }
 
-  onMouseDown(e) {
-    if (this.isMouseOverElement(e)) {
-      this.isMousePressed = true;
-      console.log('y rocket');
-    }
+  /**
+   * Checks if the mouse cursor is over an element.
+   *
+   * @param {MouseEvent} e Mouse event.
+   * @param {number=} x0 The X coordinate of the point around which the rotation of the element is performed.
+   * @param {number=} y0 the Y coordinate of the point around which the rotation of the element is performed.
+   *
+   * @return {boolean} If the mouse cursor is over an element.
+   */
+  isMouseOverElement(e, x0 = this.x + this.width / 2, y0 = this.y) {
+    this.rotation += 90;
+    const isMouseOver = super.isMouseOverElement(e, x0, y0);
+    this.rotation -= 90;
+    return isMouseOver;
   }
 
-  onMouseUp() {
-    this.isMousePressed = false;
-  }
-
+  /**
+   * Allows to change the initial height of the rocket by drag and drop.
+   *
+   * @param {MouseEvent} e Mouse event.
+   */
   onMouseMove(e) {
     if (this.isMouseOverElement(e)) {
-      canvas.style.cursor = 'pointer';
+      state.canvas.style.cursor = 'pointer';
     } else {
-      canvas.style.cursor = 'default';
+      state.canvas.style.cursor = 'default';
     }
-    // if (this.isMousePressed) {
-    //   const h = mouse(e).y - this.height / 2;
-    //   if (h > (GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - this.height / 2) || h < 200) {
-    //     return;
-    //   }
-    //   y0 = mouse(e).y - this.height / 2;
-    //   this.y = y0;
-    // }
+
+    if (this.isMousePressed && !state.isPlaying) {
+      const h = this._getMouseCoords(e).y - this.height / 2;
+      if (h > (GAME_CONFIG.GAME_HEIGHT - GAME_CONFIG.BACKGROUND_HEIGHT - this.height / 2) || h < 200) {
+        return;
+      }
+      this.y0 = this._getMouseCoords(e).y - this.height / 2;
+      this.y = this.y0;
+    }
   }
 
-
+  /**
+   * Replaces the current coordinates in the formula for the movement of the body thrown at an angle to the horizon.
+   */
   reset() {
-    x0 = this.x;
-    y0 = this.y;
-    //v0 = 150;
-    t = 0;
+    this.x0 = this.x;
+    this.y0 = this.y;
+    this.t = 0;
   }
 
+  /**
+   * Calculates new coordinates for the rocket using a standard physics formula.
+   * Calculates the rotation angle based on the old and new coordinates.
+   * Calculates the maximum flight altitude during the whole game and the maximum range for the current parabola.
+   * Determines whether the rocket has fallen to the floor level and launches again at a reflected angle
+   * with a changed force level (loss of kinetic energy)
+   *
+   * @param {number} delta Value to change the time coordinate.
+   */
   move(delta) {
-    let angleInRads = angle * (Math.PI / 180);
-    const x1 = x0 + state.speed * Math.cos(angleInRads) * t * (1 / scale);
-    const y1 = y0 - (state.speed * Math.sin(angleInRads) * t - g * t * t / 2) * (1 / scale);
-    this.rotation = radToDeg(Math.atan((y1 - this.y) / (x1 - this.x)));
-    console.log('rotation ', this.rotation);
+    let rads = this._degToRad(state.angle);
+
+    const x1 = this.x0 + state.power * Math.cos(rads) * this.t * (1 / GAME_CONFIG.SCALE);
+    const y1 = this.y0 - (state.power * Math.sin(rads) * this.t - GAME_CONFIG.G * this.t * this.t / 2) * (1 / GAME_CONFIG.SCALE);
+
+    this.rotation = this._radToDeg(Math.atan((y1 - this.y) / (x1 - this.x)));
     this.x = x1;
     this.y = y1;
-    //const y1 = y0 - (v0 * Math.sin(alpha) * t - g * t * t / 2) * (1 / scale);
 
-    //this.angle = 180 * radians / Math.PI;
-    t += delta * scale;
+    if (state.isPlaying) {
+      this.t += delta * GAME_CONFIG.SCALE;
+    }
 
-    // console.log(this.x, this.y, this.image.width, this.image.height);
+    const Lmax = state.power * state.power * Math.sin(2 * rads) / GAME_CONFIG.G;
 
-    //  const rocketY = getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y;
-    const rocketY = this.y;//getRotatedCoordinates(this.x + this.width / 2, this.y, this, this.rotation).y;
+    if (this.Lmax !== Lmax) {
+      this.Lmax = Lmax;
+      if (this.Lmax < this.width) {
+        this.gameOver();
+        return;
+      }
+    }
 
+    if (this.center.y < this.maxY) {
+      this.maxY = this.center.y;
+    }
 
-    const rocketCenter = {
-      x: this.x - this.width / 2,
-      y: this.y + this.height / 2
-    };
-
-    console.log('y', rocketY);
-    const rotatedY = getRotatedCoordinates(this.x, rocketCenter.y, this, this.rotation).y;
-    console.log('rotatedY', rotatedY);
-    if (this.y - this.height / 2 > y_floor) {
-      //debugger;
-      y0 = y_floor - this.height / 2;
-      x0 = this.x;
-      state.speed *= impulseLossRatio;
-      t = 0;
+    if (this.center.y + this.height / 3 > y_floor) {
+      this.y0 = y_floor - this.height;
+      this.x0 = this.x;
+      this.t = 0;
+      state.power *= GAME_CONFIG.IMPULSE_LOSS_RATIO;
     }
 
   }
 
+  /**
+   * Simple dropping down in a collision with a wall. When falling to the floor stops the animation.
+   *
+   * @param {number} delta Value to change the time coordinate.
+   */
+  fall(delta) {
+    let rads = this._degToRad(state.angle);
+    this.y = this.y0 - (state.power * Math.sin(rads) * this.t - GAME_CONFIG.G * this.t * this.t / 2) * (1 / GAME_CONFIG.SCALE);
+    this.t += delta * GAME_CONFIG.SCALE;
+
+    if (this.center.y + this.height / 4 > y_floor) {
+      state.gameSpeed = 0;
+    }
+
+  }
+
+  /**
+   * Determines the point of canvas shift and rotate the rocket to the specified angle.
+   */
   rotate() {
     if (!this.rotation) {
       return;
     }
-    // console.log('rotation', this.rotation);
-    this.ctx.translate(this.x - camera.x + this.width / 2, this.y);
-    this.ctx.rotate(degToRad(this.rotation + 90));
-    this.ctx.translate(-this.x + camera.x - this.width / 2, -this.y);
+    this.ctx.translate(this.x - state.cameraX + this.width / 2, this.y);
+    this.ctx.rotate(this._degToRad(this.rotation + 90));
+    this.ctx.translate(-this.x + state.cameraX - this.width / 2, -this.y);
   }
 
+  /**
+   * It checks if a collision with a wall has occurred and starts the end of the game procedure, if any.
+   */
   checkWallCollision() {
-    if ((this.x + this.width / 3) >= wall.x && (this.x - this.width / 3) <= wall.x + wall.width  && this.y >= GAME_CONFIG.GAME_HEIGHT - state.wallHeight) {
-      state.gameSpeed = 0;
-      //console.log('kurwa');
+    if ((this.center.x + this.width / 4) >= this.wall.x &&
+      ((this.center.x - this.width / 4)) <= this.wall.x + this.wall.width &&
+      this.center.y >= GAME_CONFIG.GAME_HEIGHT - this.wall.height) {
+      this.gameOver();
     }
   }
 
+  /**
+   * Moves the camera if the rocket came close enough to the end of the playing field.
+   */
+  cameraMove() {
+    if (this.x > state.canvas.width - GAME_CONFIG.CAMERA_PADDING) {
+      state.cameraX = this.x - state.canvas.width + GAME_CONFIG.CAMERA_PADDING;
+    } else {
+      state.cameraX = 0;
+    }
+  }
 
+  /**
+   * Finishes the game by changing the values in the application state and sends events to change the state of
+   * the control buttons.
+   */
+  gameOver() {
+    state.isPlaying = false;
+    state.isFalling = true;
+    state.isGameOver = true;
+    window.dispatchEvent(new CustomEvent('gameover'));
+  }
+
+  /**
+   * Renders the rocket.
+   *
+   * @param {number} delta Value to change the time coordinate.
+   */
   render(delta) {
+    if (!this.rocketIdleImageReady || !this.rocketImageReady) {
+      return;
+    }
+
     if (!this.control) {
       this.control = scene.find('control');
     }
 
-    if (angle !== state.angle) {
-      angle = state.angle;
+    // if (this.rotation !== state.angle) {
+    //   this.rotation = -state.angle;
+    // }
+
+    if (state.isPlaying) {
+      this.move(delta);
+      this.cameraMove();
+    } else if (state.isFalling) {
+      this.fall(delta);
+    } else {
+      //this.rotation = this.rotation ? this.rotation : -state.angle;
     }
-
-
-    super.render();
-
 
     this.checkWallCollision();
-
-    if (state.gameSpeed) {
-      this.move(delta);
-    } else {
-      this.rotation = this.rotation ? this.rotation : -state.angle;
-    }
-
-    //}
-
     this.rotate();
 
-    if (this.x > this.ctx.canvas.width - cameraPadding) {
-      camera.x = this.x - this.ctx.canvas.width + cameraPadding;
+    if (state.isPlaying) {
+      this.ctx.drawImage(this.rocket, this.x - state.cameraX, this.y, 150, 150);
     } else {
-      camera.x = 0;
+      this.ctx.drawImage(this.rocketIdle, this.x - state.cameraX, this.y, 150, 150);
     }
-    console.log('camera x', camera.x);
 
-    this.ctx.drawImage(this.image, this.x - camera.x, this.y, 150, 150);
-    //console.log(this.y);
-    // this.ctx.beginPath();
-    // this.ctx.arc(this.x - camera.x, this.y, 10, 0, 2 * Math.PI, false);
-    // this.ctx.fillStyle = 'green';
-    // this.ctx.fill();
     this.ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 }

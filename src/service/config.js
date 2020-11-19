@@ -1,5 +1,0 @@
-export const GAME_CONFIG = {
-  GAME_WIDTH: 1000,
-  GAME_HEIGHT: 600,
-  BACKGROUND_HEIGHT: 50
-};

@@ -1,5 +1,12 @@
 # dev-challenge-xvii-online
 
+### Compiled and ready to run files are located in the dist folder.
+
+## Run without installing
+```
+npx http-server ./dist
+```
+
 ## Project setup
 ```
 npm install
@@ -15,15 +22,7 @@ npm run serve
 npm run build
 ```
 
-### Run your unit tests
-```
-npm run test:unit
-```
-
 ### Lints and fixes files
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

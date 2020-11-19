@@ -1,27 +1,33 @@
 import {GameObject} from "./_game-object";
-import {GAME_CONFIG} from "../service/config";
-import {camera} from "../camera";
-import {state} from "../state";
+import {state} from "../services/state";
+import {GAME_CONFIG} from "../services/config";
 
+/**
+ * The class responsible only for drawing the wall.
+ * All control is in the Rocket class.
+ *
+ * @extends GameObject
+ */
 export class Wall extends GameObject {
   constructor(x, y) {
     super(x, y);
     this.imageReady = false;
     this.image = new Image();
-    this.height = state.wallHeight;
-    this.height = state.wallWidth;
+    this.height = GAME_CONFIG.WALL_HEIGHT;
+    this.width = GAME_CONFIG.WALL_WIDTH;
     this.image.onload = () => {
       this.imageReady = true;
-      this.height = this.image.height;
     };
     this.image.src = './images/wall.png';
-    console.log(this.image);
   }
 
-
-  render(delta) {
-    super.render();
-
-    this.ctx.drawImage(this.image, this.x - camera.x, this.y, state.wallWidth, state.wallHeight);
+  /**
+   * Draws the wall.
+   */
+  render() {
+    if (!this.imageReady) {
+      return;
+    }
+    this.ctx.drawImage(this.image, this.x - state.cameraX, this.y, this.width, this.height);
   }
 }
