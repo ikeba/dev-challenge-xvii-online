@@ -2,6 +2,11 @@
 
 ### Compiled and ready to run files are located in the dist folder.
 
+## Run online
+```
+https://ikeba.github.io/dev-challenge-xvii-online/
+```
+
 ## Run without installing
 ```
 npx http-server ./dist
