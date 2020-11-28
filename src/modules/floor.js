@@ -11,8 +11,6 @@ export class Floor {
         this.length = floor.length;
         this.visible = floor.visible;
         this.guid = floor.guid;
-
-        console.log(this);
     }
 
     render() {

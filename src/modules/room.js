@@ -24,9 +24,9 @@ export class Room {
             })
         ]
 
-        this.cuboids = objects.cuboids.map((cuboid) => {
+        this.objects = [...objects.cuboids.map((cuboid) => {
             return new Cuboid(this, cuboid);
-        });
+        })];
 
         this.checkRoomInterception();
         this.checkFiguresInterception();
@@ -36,20 +36,20 @@ export class Room {
     }
 
     checkRoomInterception() {
-        this.cuboids.map((cuboid) => {
-            cuboid.checkRoomInterception(this);
+        this.objects.map((obj) => {
+            obj.checkRoomInterception(this);
         });
     }
 
     checkFiguresInterception() {
-        this.cuboids.map((cuboid) => {
-            cuboid.checkFiguresInterception(this);
+        this.objects.map((obj) => {
+            obj.checkFiguresInterception(this);
         });
     }
 
     checkFlying() {
-        this.cuboids.map((cuboid) => {
-            cuboid.checkFlying(this);
+        this.objects.map((obj) => {
+            obj.checkFlying(this);
         });
     }
 
@@ -64,7 +64,9 @@ export class Room {
     render() {
         const floor = Shape.Prism(new Point(0, 0, 0), this.width, this.length, 0);
         this.iso.add(floor, new Color(211, 211, 211));
-        this.cuboids.map((cuboid) => cuboid.render());
+        this.objects
+            //.sort((obj1, obj2) => obj1.x > obj2.x)
+            .map((obj) => obj.render());
         this.floors.map((floor) => floor.render());
     }
 
