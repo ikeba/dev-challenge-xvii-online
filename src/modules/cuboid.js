@@ -2,10 +2,10 @@ import {Point, Shape} from "isomer";
 import {guid} from "@/modules/common";
 
 export class Cuboid {
-    constructor(iso, cuboid) {
+    constructor(room, cuboid) {
         this.guid = guid();
 
-        this.iso = iso;
+        this.iso = room.iso;
 
         this.x = cuboid.x;
         this.y = cuboid.y;
@@ -14,21 +14,24 @@ export class Cuboid {
         this.length = cuboid.length;
         this.height = cuboid.height;
 
+        room.addFloor(this.x, this.y, this.z + this.height, this.width, this.length, this.guid);
+
         this.roomInterception = false;
         this.figureInterception = false;
+        this.isFlying = false;
     }
 
     get volume() {
         return this.width * this.length * this.height;
     }
 
-    checkRoomSideInterception(coord, size, targetCoord, targetSize) {
+    _checkRoomSideInterception(coord, size, targetCoord, targetSize) {
         return (coord < targetCoord || coord > (targetCoord + targetSize)
             || ((coord + size) < targetCoord || (coord + size) > (targetCoord + targetSize)));
     }
 
     // нулевая координата и дальняя координата
-    checkSideInterception(box1, box2) {
+    _checkSideInterception(box1, box2) {
 
         if (box1.x >= box2.x1 || box1.x1 <= box2.x) {
             return false;
@@ -41,9 +44,9 @@ export class Cuboid {
     }
 
     checkRoomInterception(room) {
-        this.roomInterception = this.checkRoomSideInterception(this.x, this.width, room.x, room.width);
-        this.roomInterception = this.checkRoomSideInterception(this.y, this.length, room.y, room.length);
-        this.roomInterception = this.checkRoomSideInterception(this.z, this.height, room.z, room.height);
+        this.roomInterception = this._checkRoomSideInterception(this.x, this.width, room.x, room.width);
+        this.roomInterception = this._checkRoomSideInterception(this.y, this.length, room.y, room.length);
+        this.roomInterception = this._checkRoomSideInterception(this.z, this.height, room.z, room.height);
     }
 
     checkFiguresInterception(room) {
@@ -52,7 +55,7 @@ export class Cuboid {
                 return;
             }
             // проекция х + z
-            this.figureInterception = this.checkSideInterception(
+            this.figureInterception = this._checkSideInterception(
                 {
                     x: this.x,
                     y: this.z,
@@ -70,7 +73,7 @@ export class Cuboid {
             );
 
             // проекция y + z
-            this.figureInterception = this.checkSideInterception(
+            this.figureInterception = this._checkSideInterception(
                 {
                     x: this.y,
                     y: this.z,
@@ -87,7 +90,7 @@ export class Cuboid {
                 },
             );
             // проекция x + y
-            this.figureInterception = this.checkSideInterception(
+            this.figureInterception = this._checkSideInterception(
                 {
                     x: this.x,
                     y: this.y,
@@ -103,16 +106,46 @@ export class Cuboid {
 
                 },
             );
-            // this.figureInterception = this.checkSideInterception(this.x, this.width, cuboid.x, cuboid.width);
-            // this.figureInterception = this.checkSideInterception(this.y, this.length, cuboid.y, cuboid.length);
-            // this.figureInterception = this.checkSideInterception(this.z, this.height, cuboid.z, cuboid.height);
         });
-        console.log('figures', this.figureInterception);
+    }
+
+    checkFlying(room) {
+        const floors = room.floors;
+        for (let i = 0; i < floors.length; i++) {
+            if (this.guid === floors[i].guid) {
+                console.log('this is the floor');
+                continue;
+            }
+            // z must me euqal floor z
+            // figure down i=side should intercept floor
+            if (this.z === floors[i].z && this._checkSideInterception(
+                {
+                    x: this.x,
+                    y: this.y,
+                    x1: this.x + this.width,
+                    y1: this.y + this.length
+
+                },
+                {
+                    x: floors[i].x,
+                    y: floors[i].y,
+                    x1: floors[i].x + floors[i].width,
+                    y1: floors[i].y + floors[i].length
+
+                },
+            )) {
+                return;
+            }
+        }
+        console.log('flying');
+        this.isFlying = true;
     }
 
     render() {
-        console.log(this.roomInterception);
-        console.log(this.volume);
+        console.log(this.guid);
+        console.log('figureInterception', this.figureInterception);
+        console.log('roomInterception', this.roomInterception);
+        console.log('----------');
         this.iso.add(
             Shape.Prism(new Point(this.x, this.y, this.z), this.width, this.length, this.height)
         );

@@ -8,7 +8,7 @@ export const mock = {
         {
             x: 6,
             y: 0,
-            z: 0,
+            z: 5,
             width: 5,
             length: 5,
             height: 5
