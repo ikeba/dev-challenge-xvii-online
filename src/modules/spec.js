@@ -5,14 +5,7 @@ export const mock = {
         height: 15
     },
     cuboids: [
-        {
-            x: 6,
-            y: 0,
-            z: 0,
-            width: 5,
-            length: 5,
-            height: 5
-        },
+
         {
             x: 0,
             y: 0,
@@ -20,7 +13,16 @@ export const mock = {
             width: 5,
             length: 5,
             height: 5
-        }]
+        }],
+    pyramids: [
+        {
+            x: 0,
+            y: 5,
+            z: 0,
+            length: 5,
+            height: 5
+        },
+    ]
 }
 
 export class Spec {
@@ -28,7 +30,8 @@ export class Spec {
         this.room = data.room;
 
         this.objects = {
-            cuboids: data.cuboids
+            cuboids: data.cuboids,
+            pyramids: data.pyramids
         };
 
     }

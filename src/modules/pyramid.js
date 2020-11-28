@@ -16,77 +16,96 @@ export class Pyramid extends Figure {
     checkRoomInterception(room) {
         this.roomInterception = this._checkRoomSideInterception(this.x, this.length, room.x, room.width);
         this.roomInterception = this._checkRoomSideInterception(this.y, this.length, room.y, room.length);
+        // TODO: y interception
     }
 
-    // checkFiguresInterception(room) {
-    //     room.objects.forEach((obj, index) => {
-    //         if (this.guid === obj.guid) {
-    //             return;
-    //         }
-    //         // проекция х + z
-    //         if (obj.type === FIGURE_TYPES.CUBOID) {
-    //             this.figureInterception = this._checkSideInterception(
-    //                 {
-    //                     x: this.x,
-    //                     y: this.z,
-    //                     x1: this.x + this.width,
-    //                     y1: this.z + this.height
-    //
-    //                 },
-    //                 {
-    //                     x: obj.x,
-    //                     y: obj.z,
-    //                     x1: obj.x + obj.width,
-    //                     y1: obj.z + obj.height
-    //
-    //                 },
-    //             );
-    //
-    //             // проекция y + z
-    //             this.figureInterception = this._checkSideInterception(
-    //                 {
-    //                     x: this.y,
-    //                     y: this.z,
-    //                     x1: this.y + this.length,
-    //                     y1: this.z + this.height
-    //
-    //                 },
-    //                 {
-    //                     x: obj.y,
-    //                     y: obj.z,
-    //                     x1: obj.y + obj.length,
-    //                     y1: obj.z + obj.height
-    //
-    //                 },
-    //             );
-    //             // проекция x + y
-    //             this.figureInterception = this._checkSideInterception(
-    //                 {
-    //                     x: this.x,
-    //                     y: this.y,
-    //                     x1: this.x + this.width,
-    //                     y1: this.y + this.length
-    //
-    //                 },
-    //                 {
-    //                     x: obj.x,
-    //                     y: obj.y,
-    //                     x1: obj.x + obj.width,
-    //                     y1: obj.y + obj.length
-    //
-    //                 },
-    //             );
-    //             return;
-    //         }
-    //     });
-    // }
+    checkFiguresInterception(room) {
+        room.objects.forEach((obj, index) => {
+            if (this.guid === obj.guid) {
+                return;
+            }
+            if (obj.type === FIGURE_TYPES.CUBOID) {
+                let baseInterception;
+                let sideAInterception;
+                let sideBInterception;
 
+                baseInterception = this._checkSideInterception(
+                    {
+                        x: this.x,
+                        y: this.y,
+                        x1: this.x + this.length,
+                        y1: this.y + this.length
 
+                    },
+                    {
+                        x: obj.x,
+                        y: obj.y,
+                        x1: obj.x + obj.width,
+                        y1: obj.y + obj.length
+                    }
+                );
+
+                const sideA = {
+                    a: {
+                        x: this.x,
+                        y: this.z
+                    },
+                    b: {
+                        x: this.x + this.length,
+                        y: this.z
+                    },
+                    c: {
+                        x: this.x + this.length / 2,
+                        y: this.z + this.height
+                    }
+                };
+
+                const sideB = {
+                    a: {
+                        x: this.y,
+                        y: this.z
+                    },
+                    b: {
+                        x: this.y + this.length,
+                        y: this.z
+                    },
+                    c: {
+                        x: this.y + this.length / 2,
+                        y: this.z + this.height
+                    }
+                }
+
+                sideAInterception = this._checkTriangleInterception(obj.x, obj.z, obj.width, obj.height, sideA);
+                sideBInterception = this._checkTriangleInterception(obj.y, obj.z, obj.length, obj.height, sideB);
+
+                const interception = (baseInterception && sideAInterception)
+                    || (baseInterception && sideBInterception)
+                    || (sideAInterception && sideBInterception)
+                    || (baseInterception && ((this.z >= obj.z && (this.z < (obj.z + obj.height))) || (this.z + this.height) < (obj.z + obj.height)));
+
+                if (interception && !obj.figureInterception) {
+                    obj.figureInterception = interception;
+                    this.figureInterception = interception;
+                }
+            }
+        });
+    }
+
+    checkFlying(room) {
+        const base = {
+            x: this.x,
+            y: this.y,
+            x1: this.x + this.length,
+            y1: this.y + this.length
+
+        };
+        super._checkFlying(room, base);
+    }
 
     render() {
         super.render();
         this.iso.add(
-            Shape.Prism(new Point(this.x, this.y, this.z), this.width, this.length, this.height)
+            Shape.Pyramid(new Point(this.x, this.y, this.z), this.length, this.length, this.height), this.color
         );
     }
 }

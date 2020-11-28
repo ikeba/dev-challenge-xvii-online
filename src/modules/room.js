@@ -2,6 +2,7 @@ import {Point, Shape, Color} from "isomer";
 import {Cuboid} from "@/modules/cuboid";
 
 import {Floor} from "@/modules/floor";
+import {Pyramid} from "@/modules/pyramid";
 
 export class Room {
     constructor(iso, room, objects) {
@@ -24,9 +25,14 @@ export class Room {
             })
         ]
 
-        this.objects = [...objects.cuboids.map((cuboid) => {
-            return new Cuboid(this, cuboid);
-        })];
+        this.objects = [
+            ...objects.cuboids.map((cuboid) => {
+                return new Cuboid(this, cuboid);
+            }),
+            ...objects.pyramids.map((pyramid) => {
+                return new Pyramid(this, pyramid);
+            }),
+        ];
 
         this.checkRoomInterception();
         this.checkFiguresInterception();
@@ -56,7 +62,7 @@ export class Room {
     addFloor(x, y, z, width, length, guid = null) {
         this.floors.push(new Floor(this, {
             x, y, z, width, length,
-             guid
+            guid
         }));
     }
 

@@ -23,13 +23,13 @@ export class Cuboid extends Figure {
     checkFiguresInterception(room) {
         room.objects.forEach((obj, index) => {
             if (this.guid === obj.guid) {
-                return;
+                return false;
             }
             // проекция х + z
-            let XZinterception;
-            let YZinterception;
-            let XYinterception;
             if (obj.type === FIGURE_TYPES.CUBOID) {
+                let XZinterception;
+                let YZinterception;
+                let XYinterception;
                 XZinterception = this._checkSideInterception(
                     {
                         x: this.x,
@@ -81,12 +81,13 @@ export class Cuboid extends Figure {
 
                     },
                 );
-                //return;
+                this.figureInterception = (XZinterception && YZinterception) || (XZinterception && XYinterception) || (YZinterception && XYinterception)
+
+                console.log('XZinterception', XZinterception);
+                console.log('YZinterception', YZinterception);
+                console.log('XYinterception', XYinterception);
+                return;
             }
-            this.figureInterception = (XZinterception && YZinterception) || (XZinterception && XYinterception) || (YZinterception && XYinterception)
-            console.log('XZinterception', XZinterception);
-            console.log('YZinterception', YZinterception);
-            console.log('XYinterception', XYinterception);
         });
     }
 
@@ -104,7 +105,7 @@ export class Cuboid extends Figure {
     render() {
         super.render();
         this.iso.add(
-            Shape.Prism(new Point(this.x, this.y, this.z), this.width, this.length, this.height)
+            Shape.Prism(new Point(this.x, this.y, this.z), this.width, this.length, this.height), this.color
         );
     }
 

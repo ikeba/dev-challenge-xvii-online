@@ -1,4 +1,5 @@
 import {guid} from "@/modules/common";
+import {Color} from "isomer";
 
 export class Figure {
     constructor(room, figure) {
@@ -11,6 +12,8 @@ export class Figure {
         this.length = figure.length;
         this.height = figure.height;
 
+        this.color = new Color(192, 192, 192);
+
         this.roomInterception = false;
         this.figureInterception = false;
         this.isFlying = false;
@@ -19,6 +22,29 @@ export class Figure {
     _checkRoomSideInterception(coord, size, targetCoord, targetSize) {
         return (coord < targetCoord || coord > (targetCoord + targetSize)
             || ((coord + size) < targetCoord || (coord + size) > (targetCoord + targetSize)));
+    }
+
+    _checkTriangleInterception(x, y, width, length, triangle) {
+        const pointInterception = (dx, dy) => {
+
+            function cross_product(x1, y1, x2, y2, x, y) {
+                return (x - x2) * (y2 - y1) - (y - y2) * (x2 - x1);
+            }
+
+            const {a, b, c} = triangle;
+
+            const cp1 = cross_product(a.x, a.y, b.x, b.y, dx, dy) < 0.0;
+            const cp2 = cross_product(b.x, b.y, c.x, c.y, dx, y) < 0.0;
+            const cp3 = cross_product(c.x, c.x, a.x, a.y, dx, dy) < 0.0;
+
+            return cp1 === cp2 && cp2 === cp3 && cp3 === cp1;
+        };
+
+        return pointInterception(x, y)
+            || pointInterception(x, y + length)
+            || pointInterception(x + width, y)
+            || pointInterception(x + width, y + length);
+
     }
 
     _checkSideInterception(box1, box2) {
@@ -71,6 +97,10 @@ export class Figure {
         this.isFlying = true;
     }
 
+    setError() {
+        this.color = new Color(255,153, 153);
+    }
+
     render() {
         console.log('type: ', this.type);
         console.log('guid: ', this.guid);
@@ -79,6 +109,9 @@ export class Figure {
         console.log('roomInterception', this.roomInterception);
         console.log('flying', this.isFlying);
         console.log('----------');
+        if (this.roomInterception || this.figureInterception || this.isFlying) {
+            this.setError();
+        }
     }
 
 }
