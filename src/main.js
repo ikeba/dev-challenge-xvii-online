@@ -1,59 +1,11 @@
-import {scene} from "./services/scene";
-import {GAME_CONFIG} from "./services/config";
-import './services/controls';
-import {state} from "./services/state";
+import Isomer, {Shape, Point} from "isomer";
 
-let canvas;
-let context;
-let delta = 0;
-let oldTimeStamp = 0;
+import {Room} from "@/modules/room";
+import {Spec} from "@/modules/spec";
+import {mock} from "@/modules/spec";
 
-window.onload = init;
+const iso = new Isomer(document.getElementById('iso'));
 
-/**
- * Initializes initial application container.
- *
- * @return {undefined}
- */
-function init() {
-  canvas = document.getElementById('game');
-  context = canvas.getContext('2d');
+const spec = new Spec(mock);
 
-  canvas.setAttribute('width', String(GAME_CONFIG.GAME_WIDTH));
-  canvas.setAttribute('height', String(GAME_CONFIG.GAME_HEIGHT));
-
-  state.canvas = canvas;
-  scene.initialize(context);
-
-  window.requestAnimationFrame(gameLoop);
-}
-
-/**
- * Count time to understand real FPS. Calls render function.
- *
- * @param timeStamp
- * @return {undefined}
- */
-function gameLoop(timeStamp) {
-  delta = (timeStamp - oldTimeStamp) / 1000;
-  oldTimeStamp = timeStamp;
-
-  render(delta);
-  requestAnimationFrame(gameLoop);
-}
-
-/**
- * Goes through the scene, clears canvas and renders each gameObject with predefined speed.
- *
- * @param delta
- * @return {undefined}
- */
-function render(delta) {
-  if (!context) {
-    return;
-  }
-  context.clearRect(0, 0, canvas.width, canvas.height);
-  scene.render(delta * state.gameSpeed * GAME_CONFIG.SPEED_SCALE);
-}
-
-requestAnimationFrame(gameLoop);
+const room = new Room(iso, spec.room, spec.objects);

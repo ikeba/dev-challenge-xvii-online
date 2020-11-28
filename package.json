@@ -8,17 +8,13 @@
     "build_prod": "vue-cli-service build --mode production",
     "lint": "vue-cli-service lint"
   },
-  "dependencies": {
-    "vue": "^2.6.11"
-  },
   "devDependencies": {
-    "@vue/cli-plugin-eslint": "^4.5.0",
-    "@vue/cli-plugin-unit-jest": "^4.5.0",
     "@vue/cli-service": "^4.5.0",
-    "@vue/test-utils": "^1.0.3",
     "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^6.2.2",
     "http-server": "^0.12.3",
     "vue-template-compiler": "^2.6.11"
+  },
+  "dependencies": {
+    "isomer": "^0.2.6"
   }
 }
